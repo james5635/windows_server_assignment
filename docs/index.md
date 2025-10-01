@@ -19,3 +19,5 @@ Welcome to Windows Server Assignment. This includes guides for the assignment.
 - Database Server (MySQL, PostgreSQL, MongoDB, SQL Server, Oracle)
 - Backup Server
 - Model: LLMs - Large Language Model
+
+dog
