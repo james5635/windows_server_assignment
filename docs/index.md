@@ -1,17 +1,21 @@
-# Welcome to MkDocs
+# Introduction
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Welcome to Windows Server Assignment. This includes guides for the assignment.
 
-## Commands
+## Contents
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+- AWS Cloud
+- File Server
+- DNS Server (Domain name <-> IP)
+- DHCP Server
+- VPN Server
+- Web Server (http, https)
+- Domain Controller (users, computer...)
+- FTP Server (Share resource Internet)
+- Proxy Server (Sharing and caching Internet)
+- Terminal Server
+- Load Balancing
+- Failover cluster
+- Database Server (MySQL, PostgreSQL, MongoDB, SQL Server, Oracle)
+- Backup Server
+- Model: LLMs - Large Language Model

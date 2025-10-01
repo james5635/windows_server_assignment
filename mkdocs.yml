@@ -1,4 +1,14 @@
-site_name: My Docs
+site_name: Windows Server Assignment
 site_url: https://mydomain.org/mysite
 theme:
   name: material
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+plugins:
+  # - to-pdf:
+  #     download_link: header
+  #     author: Sou Chanrojame, Orn Pheakdey, Long Neron, Then Sivthean, Le Sreyma
+  #     copyright: Copyright © Sou Chanrojame 2025
+  #     cover_subtitle: Guides for the assignment
