@@ -5,6 +5,7 @@ Welcome to Windows Server Assignment. This includes guides for the assignment.
 ## Contents
 
 Windows/Linux - Cloud
+
 1. File Server
 2. Proxy Server (Caching, Control Access)
 3. DNS Server
