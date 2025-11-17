@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Windows File Server (Lab Environment Compatible)
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+    Description: EC2 Instance type allowed in the lab.
+
+  KeyName:
+    Type: String
+    AllowedValues:
+        - x
+        - vockey
+    Default: vockey
+    Description: KeyPair (use vockey for us-east-1 per lab instructions)
+  WindowsAmi:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+
+Resources:
+
+  FileServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SMB and RDP access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 445
+          ToPort: 445
+          CidrIp: 0.0.0.0/0   # SMB (optional, tighten if needed)
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0   # RDP (optional)
+      VpcId: !Ref AWS::NoValue  # Auto for default VPC
+
+  FileServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref FileServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Install-WindowsFeature -Name FS-FileServer
+          New-Item -Path "C:\FileShare" -ItemType Directory -Force
+          New-SmbShare -Name "PublicShare" -Path "C:\FileShare" -FullAccess "Everyone"
+          Write-Host "File Server setup complete."
+          </powershell>
+
+
+Outputs:
+  FileServerPublicDNS:
+    Description: File Server Public DNS
+    Value: !GetAtt FileServerInstance.PublicDnsName
+
+  SharePath:
+    Description: SMB Share Path
+    Value: "\\\\${FileServerInstance.PublicDnsName}\\PublicShare"

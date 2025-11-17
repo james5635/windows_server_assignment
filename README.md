@@ -10,7 +10,7 @@ Windows/Linux - Cloud
 6. Terminal Server (Thin Clients)
 7. Web Server
 8. Mail Server
-9. Database Server (MongoDB, Oracle, SQL Server, PostgreSQL
+9. Database Server (MongoDB, Oracle, SQL Server, PostgreSQL)
 10. Backup Server
 11. Load Balancing
 12. Failover Cluster
@@ -30,7 +30,7 @@ LLMs - Large Language Model  (Fine Tuner)
 6. Terminal Server (Thin Clients)
 7. Web Server
 8. Mail Server
-9. Database Server (MongoDB, Oracle, SQL Server, PostgreSQL
+9. Database Server (MongoDB, Oracle, SQL Server, PostgreSQL)
 10. Backup Server
 11. Load Balancing
 12. Failover Cluster
