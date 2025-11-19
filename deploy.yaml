@@ -30,7 +30,7 @@ Parameters:
       - /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
       - /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 Resources:
-  # start File Server
+  # start file server
   FileServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -92,9 +92,9 @@ Resources:
           Value: TestFileServer
         - Key: Environment
           Value: Development
-  # end File Server
+  # end file server
 
-  # start Proxy Server
+  # start proxy server
   ProxyServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -159,9 +159,81 @@ Resources:
           Value: TestProxyServer
         - Key: Environment
           Value: Development
-# end Proxy Server
+  # end proxy server
 
+  # start terminal server
+  TerminalServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow RDP access for Terminal Server
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0  # Allow RDP
+      VpcId: !Ref AWS::NoValue   # default VPC
+
+  TerminalServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref TerminalServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: TerminalServer
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Start-Transcript -Path "C:\userdata.log" -Append
+          
+          # Install Remote Desktop Session Host Role
+          Install-WindowsFeature RDS-RD-Server
+
+          # Enable Multiple Sessions
+          Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server" -Name fSingleSessionPerUser -Value 0
+
+          # Allow RDP Firewall Rule
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+          Write-Host "Terminal Server (RDS Session Host) setup complete."
+          
+          Stop-Transcript
+          </powershell>
+
+  TerminalServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref TerminalServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: TerminalServer
+        - Key: Environment
+          Value: Development
+  # end terminal server
+  
 Outputs:
+  # file server
   FileServerPublicDNS:
     Description: File Server Public DNS
     Value: !GetAtt FileServerInstance.PublicDnsName
@@ -169,6 +241,18 @@ Outputs:
     Description: SMB Share Path
     Value: "\\\\${FileServerInstance.PublicDnsName}\\PublicShare"
 
+  # proxy server
   ProxyServerPublicDNS:
     Description: Proxy Server Public DNS
     Value: !GetAtt ProxyServerInstance.PublicDnsName
+  ProxyServerPrivateIP:
+    Description: Proxy Server Private IP
+    Value: !GetAtt ProxyServerInstance.PrivateIp
+
+  # terminal server
+  TerminalServerPublicIP:
+    Description: Public IP of Terminal Server
+    Value: !GetAtt TerminalServerInstance.PublicIp
+  RDPConnection:
+    Description: Use this to connect via Remote Desktop
+    Value: !Sub "RDP to: ${TerminalServerInstance.PublicDnsName}"

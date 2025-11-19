@@ -22,8 +22,8 @@ LLMs - Large Language Model  (Fine Tuner)
 
 # To-do List
 
-1. File Server
-2. Proxy Server (Caching, Control Access)
+1. File Server ✅
+2. Proxy Server (Caching, Control Access) ✅
 3. DNS Server
 4. DHCP Server
 5. VPN Server
