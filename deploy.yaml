@@ -136,7 +136,7 @@ Resources:
           <powershell>
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install squid -y
-          Invoke-WebRequest <url> -OutFile "C:\Squid\etc\squid\squid.conf"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/squid.conf -OutFile "C:\Squid\etc\squid\squid.conf"
           C:\Squid\bin\squid.exe -n squid
           </powershell>
   TestProxyServerInstance:
