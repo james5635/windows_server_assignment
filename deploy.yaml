@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Windows File Server (Lab Environment Compatible)
+Description: 15 Windows Server on AWS Cloud
 
 Parameters:
   InstanceType:
@@ -211,7 +211,7 @@ Resources:
           Stop-Transcript
           </powershell>
 
-  TerminalServerInstance:
+  TestTerminalServerInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -227,7 +227,7 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: TerminalServer
+          Value: TestTerminalServer
         - Key: Environment
           Value: Development
   # end terminal server
