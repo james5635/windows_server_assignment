@@ -25,10 +25,13 @@ Parameters:
     Description: KeyPair (use vockey for us-east-1 per lab instructions)
   WindowsAmi:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
-
+    Default: /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
+    AllowedValues:
+        - /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
+        - /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 Resources:
-
+  
+# start File Server
   FileServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -58,6 +61,11 @@ Resources:
           Ebs:
             VolumeSize: 35
             VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: FileServer
+        - Key: Environment
+          Value: Development
       UserData:
         Fn::Base64: !Sub |
           <powershell>
@@ -66,6 +74,91 @@ Resources:
           New-SmbShare -Name "PublicShare" -Path "C:\FileShare" -FullAccess "Everyone"
           Write-Host "File Server setup complete."
           </powershell>
+  TestFileServerInstance:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref KeyName
+        IamInstanceProfile: LabInstanceProfile
+        ImageId: !Ref WindowsAmi
+        SecurityGroupIds:
+          - !Ref FileServerSG
+        BlockDeviceMappings:
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeSize: 35
+              VolumeType: gp2
+        Tags:
+          - Key: Name
+            Value: TestFileServer
+          - Key: Environment
+            Value: Development
+# end File Server
+
+  
+# start Proxy Server
+  ProxyServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable RDP access
+      SecurityGroupIngress:
+        # - IpProtocol: tcp
+        #   FromPort: 445
+        #   ToPort: 445
+        #   CidrIp: 0.0.0.0/0   # SMB (optional, tighten if needed)
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0   # RDP (optional)
+      VpcId: !Ref AWS::NoValue  # Auto for default VPC
+
+  ProxyServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref ProxyServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: ProxyServer
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install squid -y
+          Invoke-WebRequest <url> -OutFile "C:\Squid\etc\squid\squid.conf"
+          C:\Squid\bin\squid.exe -n squid
+          </powershell>
+  TestProxyServerInstance:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref KeyName
+        IamInstanceProfile: LabInstanceProfile
+        ImageId: !Ref WindowsAmi
+        SecurityGroupIds:
+          - !Ref ProxyServerSG
+        BlockDeviceMappings:
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeSize: 35
+              VolumeType: gp2
+        Tags:
+          - Key: Name
+            Value: TestProxyServer
+          - Key: Environment
+            Value: Development
+# end Proxy Server
 
 
 Outputs:
