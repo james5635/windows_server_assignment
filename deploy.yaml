@@ -30,7 +30,7 @@ Parameters:
       - /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
       - /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 Resources:
-  # start file server
+  # begin file server
   FileServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -94,7 +94,7 @@ Resources:
           Value: Development
   # end file server
 
-  # start proxy server
+  # begin proxy server
   ProxyServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -161,7 +161,7 @@ Resources:
           Value: Development
   # end proxy server
 
-  # start terminal server
+  # begin terminal server
   TerminalServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -170,8 +170,8 @@ Resources:
         - IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
-          CidrIp: 0.0.0.0/0  # Allow RDP
-      VpcId: !Ref AWS::NoValue   # default VPC
+          CidrIp: 0.0.0.0/0 # Allow RDP
+      VpcId: !Ref AWS::NoValue # default VPC
 
   TerminalServerInstance:
     Type: AWS::EC2::Instance
@@ -196,7 +196,7 @@ Resources:
         Fn::Base64: !Sub |
           <powershell>
           Start-Transcript -Path "C:\userdata.log" -Append
-          
+
           # Install Remote Desktop Session Host Role
           Install-WindowsFeature RDS-RD-Server
 
@@ -207,7 +207,7 @@ Resources:
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
           Write-Host "Terminal Server (RDS Session Host) setup complete."
-          
+
           Stop-Transcript
           </powershell>
 
@@ -231,7 +231,168 @@ Resources:
         - Key: Environment
           Value: Development
   # end terminal server
-  
+
+  # begin database server
+  DatabaseServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow
+      SecurityGroupIngress:
+        - IpProtocol: tcp # Allow PostgreSQL
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow SQL Server
+          FromPort: 50415
+          ToPort: 50415
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow MongoDB
+          FromPort: 27017
+          ToPort: 27017
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # RDP (optional)
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref AWS::NoValue # default VPC
+
+  PostgreSQLInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref DatabaseServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: PostgreSQL
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Start-Transcript -Path "C:\userdata.log" -Append
+
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install postgresql11 --params '/Password:test /AllowRemote' -y
+          Restart-Service postgresql-x64-11
+
+          Stop-Transcript
+          </powershell>
+  SQLServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref DatabaseServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: SQLServer
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Start-Transcript -Path "C:\userdata.log" -Append
+
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install mssqlserver2014express -y
+
+          # Get access to SqlWmiManagement DLL on the machine with SQL
+          # we are on, which is where SQL Server was installed.
+          # Note: This is installed in the GAC by SQL Server Setup.
+
+          [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SqlWmiManagement')
+
+          # Instantiate a ManagedComputer object that exposes primitives to control the
+          # Installation of SQL Server on this machine.
+
+          $wmi = New-Object 'Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer' localhost
+
+          # Enable the TCP protocol on the default instance. If the instance is named,
+          # replace MSSQLSERVER with the instance name in the following line.
+
+          $tcp = $wmi.ServerInstances['SQLEXPRESS'].ServerProtocols['Tcp']
+          $tcp.IsEnabled = $true
+          $tcp.Alter()
+
+          # You need to restart SQL Server for the change to persist
+          # -Force takes care of any dependent services, like SQL Agent.
+          # Note: If the instance is named, replace MSSQLSERVER with MSSQL$ followed by
+          # the name of the instance (e.g., MSSQL$MYINSTANCE)
+
+          Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
+
+          Stop-Transcript
+          </powershell>
+  MongoDBInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref DatabaseServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: MongoDB
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Start-Transcript -Path "C:\userdata.log" -Append
+
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install mongodb -y
+          choco install mongodb-shell -y
+          Invoke-WebRequest <url> -OutFile "C:\Program Files\MongoDB\Server\8.2\bin\mongod.cfg"
+          Restart-Service MongoDB
+
+          Stop-Transcript
+          </powershell>
+
+  TestDatabaseServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref TerminalServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: TestDatabaseServer
+        - Key: Environment
+          Value: Development
+  # end database server
 Outputs:
   # file server
   FileServerPublicDNS:
@@ -256,3 +417,14 @@ Outputs:
   RDPConnection:
     Description: Use this to connect via Remote Desktop
     Value: !Sub "RDP to: ${TerminalServerInstance.PublicDnsName}"
+
+  # database server
+  PostgreSQLPublicIP:
+    Description: Public IP of PostgreSQL
+    Value: !GetAtt PostgreSQLInstance.PublicIp
+  SQLServerPublicIP:
+    Description: Public IP of SQLServer
+    Value: !GetAtt SQLServerInstance.PublicIp
+  MongoDBPublicIP:
+    Description: Public IP of MongoDB
+    Value: !GetAtt MongoDBInstance.PublicIp
