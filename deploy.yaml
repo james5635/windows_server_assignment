@@ -355,7 +355,7 @@ Resources:
 
           Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
 
-          sqlcmd -S .\SQLEXPRESS -Q "ALTER LOGIN sa ENABLE; ALTER LOGIN sa WITH PASSWORD = 'mypassword@2025';"
+          & "C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\SQLCMD.EXE"  -S .\SQLEXPRESS -Q "ALTER LOGIN sa ENABLE; ALTER LOGIN sa WITH PASSWORD = 'mypassword@2025';"
           Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.SQLEXPRESS\MSSQLServer" -Name LoginMode -Value 2
           Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
 
