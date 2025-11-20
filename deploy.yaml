@@ -244,8 +244,8 @@ Resources:
           ToPort: 5432
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp # Allow SQL Server
-          FromPort: 50415
-          ToPort: 50415
+          FromPort: 1433
+          ToPort: 1433
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp # Allow MongoDB
           FromPort: 27017
@@ -282,6 +282,7 @@ Resources:
           Start-Transcript -Path "C:\userdata.log" -Append
 
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          # username postgres
           choco install postgresql11 --params '/Password:test /AllowRemote' -y
           Restart-Service postgresql-x64-11
           New-NetFirewallRule -DisplayName "Allow PostgreSQL 5432" `
@@ -318,23 +319,33 @@ Resources:
 
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install mssqlserver2014express -y
+          choco install sqlserver-cmdlineutils -y
 
           # Get access to SqlWmiManagement DLL on the machine with SQL
           # we are on, which is where SQL Server was installed.
           # Note: This is installed in the GAC by SQL Server Setup.
 
-          [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SqlWmiManagement')
+          # Load the WMI assembly
+          [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SqlWmiManagement') | Out-Null
 
-          # Instantiate a ManagedComputer object that exposes primitives to control the
-          # Installation of SQL Server on this machine.
+          # Connect to local SQL Server machine
+          $wmi = New-Object 'Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer' 'localhost'
 
-          $wmi = New-Object 'Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer' localhost
-
-          # Enable the TCP protocol on the default instance. If the instance is named,
-          # replace MSSQLSERVER with the instance name in the following line.
-
+          # Get TCP protocol for SQLEXPRESS
           $tcp = $wmi.ServerInstances['SQLEXPRESS'].ServerProtocols['Tcp']
           $tcp.IsEnabled = $true
+
+          # Disable dynamic ports on each IP entry
+          foreach ($ip in $tcp.IPAddresses) {
+              $ip.IPAddressProperties["TcpDynamicPorts"].Value = ""
+          }
+
+          # Set static port 1433 on ALL IPs (including IPAll)
+          foreach ($ip in $tcp.IPAddresses) {
+              $ip.IPAddressProperties["TcpPort"].Value = "1433"
+          }
+
+          # Apply configuration
           $tcp.Alter()
 
           # You need to restart SQL Server for the change to persist
@@ -343,10 +354,15 @@ Resources:
           # the name of the instance (e.g., MSSQL$MYINSTANCE)
 
           Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
-          New-NetFirewallRule -DisplayName "Allow SQL Server 50415" `
+
+          sqlcmd -S .\SQLEXPRESS -Q "ALTER LOGIN sa ENABLE; ALTER LOGIN sa WITH PASSWORD = 'mypassword@2025';"
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.SQLEXPRESS\MSSQLServer" -Name LoginMode -Value 2
+          Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
+
+          New-NetFirewallRule -DisplayName "Allow SQL Server 1433" `
             -Direction Inbound `
             -Protocol TCP `
-            -LocalPort 50415 `
+            -LocalPort 1433 `
             -Action Allow
 
           Stop-Transcript
@@ -439,7 +455,7 @@ Outputs:
     Description: Public IP of PostgreSQL
     Value: !GetAtt PostgreSQLInstance.PublicIp
   SQLServerPublicIP:
-    Description: Public IP of SQLServer
+    Description: Public IP of SQLServer with port 1433
     Value: !GetAtt SQLServerInstance.PublicIp
   MongoDBPublicIP:
     Description: Public IP of MongoDB
