@@ -284,6 +284,11 @@ Resources:
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install postgresql11 --params '/Password:test /AllowRemote' -y
           Restart-Service postgresql-x64-11
+          New-NetFirewallRule -DisplayName "Allow PostgreSQL 5432" `
+            -Direction Inbound `
+            -Protocol TCP `
+            -LocalPort 5432 `
+            -Action Allow
 
           Stop-Transcript
           </powershell>
@@ -338,6 +343,11 @@ Resources:
           # the name of the instance (e.g., MSSQL$MYINSTANCE)
 
           Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
+          New-NetFirewallRule -DisplayName "Allow SQL Server 50415" `
+            -Direction Inbound `
+            -Protocol TCP `
+            -LocalPort 50415 `
+            -Action Allow
 
           Stop-Transcript
           </powershell>
@@ -370,6 +380,11 @@ Resources:
           choco install mongodb-shell -y
           Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/mongod.cfg -OutFile "C:\Program Files\MongoDB\Server\8.2\bin\mongod.cfg"
           Restart-Service MongoDB
+          New-NetFirewallRule -DisplayName "Allow MongoDB 27017" `
+            -Direction Inbound `
+            -Protocol TCP `
+            -LocalPort 27017 `
+            -Action Allow
 
           Stop-Transcript
           </powershell>
