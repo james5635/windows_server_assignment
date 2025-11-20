@@ -425,6 +425,60 @@ Resources:
   #       - Key: Environment
   #         Value: Development
   # end database server
+
+  # begin web server
+  WebServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow RDP access & http(s)
+      SecurityGroupIngress: # Allow RDP
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow http
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow https
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref AWS::NoValue # default VPC
+
+  WebServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref WebServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: WebServer
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Start-Transcript -Path "C:\userdata.log" -Append
+
+          Install-WindowsFeature -Name Web-Server -IncludeManagementTools
+          Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
+          Install-WindowsFeature -Name Web-Mgmt-Console
+          Invoke-WebRequest <url> -OutFile "C:\inetpub\wwwroot\index.html"
+
+
+          Stop-Transcript
+          </powershell>
+  # end web server
 Outputs:
   # file server
   FileServerPublicDNS:
@@ -460,3 +514,11 @@ Outputs:
   MongoDBPublicIP:
     Description: Public IP of MongoDB
     Value: !GetAtt MongoDBInstance.PublicIp
+
+  # web server
+  WebServerPublicIP:
+    Description: Public IP of Web Server
+    Value: !GetAtt WebServerInstance.PublicIp
+  WebServerPublicDNS:
+    Description: Web Server Public DNS
+    Value: !GetAtt WebServerInstance.PublicDnsName
