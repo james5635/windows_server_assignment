@@ -471,10 +471,9 @@ Resources:
           Start-Transcript -Path "C:\userdata.log" -Append
 
           Install-WindowsFeature -Name Web-Server -IncludeManagementTools
-          Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
-          Install-WindowsFeature -Name Web-Mgmt-Console
-          Invoke-WebRequest <url> -OutFile "C:\inetpub\wwwroot\index.html"
-
+          # Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
+          # Install-WindowsFeature -Name Web-Mgmt-Console
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/static/devspeed.html -OutFile "C:\inetpub\wwwroot\index.html"
 
           Stop-Transcript
           </powershell>
