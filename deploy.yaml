@@ -630,15 +630,85 @@ Resources:
           New-NetFirewallRule -DisplayName "Allow FTP Passive Ports" -Direction Inbound -Protocol TCP -LocalPort 50000-51000 -Action Allow
 
           Restart-Service FTPSVC
-          
+
           # C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch380802110\UserScript.ps1
           # apple
-          
+
           echo hello > "C:\inetpub\ftproot\hello.txt"
 
           Stop-Transcript
           </powershell>
   # end ftp server
+  # begin dns server
+  DNSServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow RDP access & dns
+      SecurityGroupIngress: # Allow RDP
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow dns tcp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp # Allow dns udp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref AWS::NoValue # default VPC
+
+  DNSServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref DNSServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: DNSServer
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Start-Transcript -Path "C:\userdata.log" -Append
+
+          Install-WindowsFeature DNS -IncludeManagementTools
+
+          Add-DnsServerPrimaryZone -Name "example.internal" -ZoneFile "example.internal.dns"
+          Add-DnsServerPrimaryZone -Name "devspeed.com" -ZoneFile "devspeed.com.dns"
+
+          Add-DnsServerResourceRecordA -Name 'server1' -ZoneName 'example.internal' -IPv4Address '10.0.1.10'
+          Add-DnsServerResourceRecordA -Name 'console' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.11'
+          Add-DnsServerResourceRecordA -Name 'go' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.29'
+          Add-DnsServerResourceRecordA -Name 'blog' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.30'
+          Add-DnsServerResourceRecordA -Name 'shop' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.31'
+          Add-DnsServerResourceRecordA -Name 'support' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.32'
+          Add-DnsServerResourceRecordA -Name 'mail' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.33'
+          Add-DnsServerResourceRecordA -Name 'www' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.34'
+          Add-DnsServerResourceRecordA -Name 'www2' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.100'
+
+          # For example, forwarding to Google DNS:
+          # Add-DnsServerForwarder -IPAddress "8.8.8.8" -PassThru
+          # Or forwarding to AWS VPC DNS (recommended for EC2). This is the Amazon-provided DNS resolver for VPCs.
+          # Add-DnsServerForwarder -IPAddress "169.254.169.253" -PassThru
+
+          New-NetFirewallRule -DisplayName "Allow DNS TCP 53" -Direction Inbound -Protocol TCP -LocalPort 53 -Action Allow
+          New-NetFirewallRule -DisplayName "Allow DNS UDP 53" -Direction Inbound -Protocol UDP -LocalPort 53 -Action Allow
+
+          Stop-Transcript
+          </powershell>
+  # end dns server
 Outputs:
   # file server
   FileServerPublicDNS:
@@ -682,3 +752,19 @@ Outputs:
   WebServerPublicDNS:
     Description: Web Server Public DNS
     Value: !GetAtt WebServerInstance.PublicDnsName
+
+  # ftp server
+  FTPServerPublicIP:
+    Description: Public IP of FTP Server
+    Value: !GetAtt FTPServerInstance.PublicIp
+  FTPServerPublicDNS:
+    Description: FTP Server Public DNS
+    Value: !GetAtt FTPServerInstance.PublicDnsName
+
+  # dns server
+  DNSServerPublicIP:
+    Description: Public IP of DNS Server
+    Value: !GetAtt DNSServerInstance.PublicIp
+  DNSServerPublicDNS:
+    Description: DNS Server Public DNS
+    Value: !GetAtt DNSServerInstance.PublicDnsName
