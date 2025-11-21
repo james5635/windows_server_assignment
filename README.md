@@ -25,7 +25,7 @@ LLMs - Large Language Model  (Fine Tuner)
 1. File Server ✅
 2. Proxy Server (Caching, Control Access) ✅
 3. DNS Server ✅
-4. DHCP Server
+4. DHCP Server ✅
 5. VPN Server
 6. Terminal Server (Thin Clients) ✅
 7. Web Server ✅
