@@ -37,10 +37,10 @@ Resources:
     Properties:
       GroupDescription: Enable SMB, DNS and RDP access
       SecurityGroupIngress:
-        - IpProtocol: tcp # SMB 
+        - IpProtocol: tcp # SMB
           FromPort: 445
           ToPort: 445
-          CidrIp: 0.0.0.0/0 
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp # Allow dns tcp
           FromPort: 53
           ToPort: 53
@@ -48,11 +48,11 @@ Resources:
         - IpProtocol: udp # Allow dns udp
           FromPort: 53
           ToPort: 53
-          CidrIp: 0.0.0.0/0 # RDP 
+          CidrIp: 0.0.0.0/0 # RDP
         - IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
-          CidrIp: 0.0.0.0/0 
+          CidrIp: 0.0.0.0/0
       VpcId: !Ref AWS::NoValue # Auto for default VPC
 
   FileServerDNSServerInstance:
@@ -79,14 +79,14 @@ Resources:
           <powershell>
           # FileServer
           Start-Transcript -Path "C:\FileServer.log" -Append
-          
+
           Install-WindowsFeature -Name FS-FileServer
           New-Item -Path "C:\FileShare" -ItemType Directory -Force
           New-SmbShare -Name "PublicShare" -Path "C:\FileShare" -FullAccess "Everyone"
           Write-Host "File Server setup complete."
-          
+
           Stop-Transcript
-          
+
           #DNSServer
           Start-Transcript -Path "C:\DNSServer.log" -Append
 
@@ -115,26 +115,30 @@ Resources:
 
           Stop-Transcript
           </powershell>
-  
+
   # end file server, dns server
 
-  # begin proxy server
-  ProxyServerSG:
+  # begin proxy server, dhcp server #2 #4
+  ProxyServerDHCPServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable RDP & Squid access
+      GroupDescription: Enable RDP & Squid access & dhcp
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3128
-          ToPort: 3128
-          CidrIp: 0.0.0.0/0 # Squid (optional, tighten if needed)
-        - IpProtocol: tcp
+        - IpProtocol: udp # dhcp port 67
+          FromPort: 67
+          ToPort: 67
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp # dhcp port 68
+          FromPort: 68
+          ToPort: 68
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # RDP
           FromPort: 3389
           ToPort: 3389
-          CidrIp: 0.0.0.0/0 # RDP (optional)
+          CidrIp: 0.0.0.0/0
       VpcId: !Ref AWS::NoValue # Auto for default VPC
 
-  ProxyServerInstance:
+  ProxyServerDHCPServerInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -142,7 +146,7 @@ Resources:
       IamInstanceProfile: LabInstanceProfile
       ImageId: !Ref WindowsAmi
       SecurityGroupIds:
-        - !Ref ProxyServerSG
+        - !Ref ProxyServerDHCPServerSG
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -150,40 +154,66 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: ProxyServer
+          Value: ProxyServerDHCPServer
         - Key: Environment
           Value: Development
       UserData:
         Fn::Base64: !Sub |
           <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
+          # proxy server
+          Start-Transcript -Path "C:\ProxyServer.log" -Append
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install squid -y
           Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/squid.conf -OutFile "C:\Squid\etc\squid\squid.conf"
           Restart-Service squidsrv
           Write-Host "Proxy Server setup complete."
           Stop-Transcript
+
+          # dhcp server
+          Start-Transcript -Path "C:\DHCPServer.log" -Append
+
+          # dhcp client will broadcast, and get ip, default gateway, dns,... from dhcp server
+          # AWS VPC DHCP is used in EC2 instance
+
+          # | Direction           | Port       | Purpose                       |
+          # | ------------------- | ---------- | ----------------------------- |
+          # | **Client → Server** | **UDP 67** | Client sends Discover/Request |
+          # | **Server → Client** | **UDP 68** | Server replies with Offer/ACK |
+          # So:
+          # DHCP Server listens on UDP port 67
+          # DHCP Client listens on UDP port 68
+
+          # 🔎 Quick Summary
+          # UDP 67 = DHCP Server Port
+          # UDP 68 = DHCP Client Port
+          # DHCP is entirely broadcast-based within a subnet.
+
+          # Install DHCP Role
+          Install-WindowsFeature DHCP -IncludeManagementTools
+
+          # If in a domain (skip if standalone)
+          # Add-DhcpServerInDC -DnsName "dhcpserver.example.internal" -IpAddress "10.0.1.10"
+
+          # Create scope
+          Add-DhcpServerv4Scope `
+              -Name "MainScope" `
+              -StartRange 10.0.1.50 `
+              -EndRange 10.0.1.150 `
+              -SubnetMask 255.255.255.0 `
+              -State Active
+
+          # Configure DHCP options
+          Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -Router 10.0.1.1
+          Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -DnsServer 10.0.1.10
+          Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -DnsDomain "example.internal"
+
+          New-NetFirewallRule -DisplayName "Allow DHCP UDP 67" -Direction Inbound -Protocol UDP -LocalPort 67 -Action Allow
+          New-NetFirewallRule -DisplayName "Allow DHCP UDP 68" -Direction Inbound -Protocol UDP -LocalPort 68 -Action Allow
+
+          Stop-Transcript
           </powershell>
-  # TestProxyServerInstance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: !Ref InstanceType
-  #     KeyName: !Ref KeyName
-  #     IamInstanceProfile: LabInstanceProfile
-  #     ImageId: !Ref WindowsAmi
-  #     SecurityGroupIds:
-  #       - !Ref ProxyServerSG
-  #     BlockDeviceMappings:
-  #       - DeviceName: /dev/sda1
-  #         Ebs:
-  #           VolumeSize: 35
-  #           VolumeType: gp2
-  #     Tags:
-  #       - Key: Name
-  #         Value: TestProxyServer
-  #       - Key: Environment
-  #         Value: Development
-  # end proxy server
+
+  # end proxy server, dhcp server
 
   # begin terminal server
   TerminalServerSG:
@@ -663,7 +693,7 @@ Resources:
           Stop-Transcript
           </powershell>
   # end ftp server
- 
+
 Outputs:
   # file server #1
   FileServerPublicDNS:
@@ -672,7 +702,7 @@ Outputs:
   SharePath:
     Description: SMB Share Path
     Value: "\\\\${FileServerDNSServerInstance.PublicDnsName}\\PublicShare"
-  
+
   # dns server #3
   DNSServerPublicIP:
     Description: Public IP of DNS Server
@@ -681,13 +711,21 @@ Outputs:
     Description: DNS Server Public DNS
     Value: !GetAtt FileServerDNSServerInstance.PublicDnsName
 
-  # proxy server
+  # proxy server #2
   ProxyServerPublicDNS:
     Description: Proxy Server Public DNS
-    Value: !GetAtt ProxyServerInstance.PublicDnsName
+    Value: !GetAtt ProxyServerDHCPServerSG.PublicDnsName
   ProxyServerPrivateIP:
     Description: Proxy Server Private IP
-    Value: !GetAtt ProxyServerInstance.PrivateIp
+    Value: !GetAtt ProxyServerDHCPServerSG.PrivateIp
+
+  # dhcp server #4
+  DHCPPublicDNS:
+    Description: DHCP Server Public DNS
+    Value: !GetAtt ProxyServerDHCPServerSG.PublicDnsName
+  DHCPPrivateIP:
+    Description: DHCP Server Private IP
+    Value: !GetAtt ProxyServerDHCPServerSG.PrivateIp
 
   # terminal server
   TerminalServerPublicIP:
@@ -723,4 +761,3 @@ Outputs:
   FTPServerPublicDNS:
     Description: FTP Server Public DNS
     Value: !GetAtt FTPServerInstance.PublicDnsName
-
