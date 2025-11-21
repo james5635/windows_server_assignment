@@ -1,3 +1,4 @@
+# 8 limited EC2 instances
 AWSTemplateFormatVersion: "2010-09-09"
 Description: 15 Windows Server on AWS Cloud
 
@@ -30,23 +31,31 @@ Parameters:
       - /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base
       - /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 Resources:
-  # begin file server
-  FileServerSG:
+  # begin file server, dns server #1 #3
+  FileServerDNSServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SMB and RDP access
+      GroupDescription: Enable SMB, DNS and RDP access
       SecurityGroupIngress:
-        - IpProtocol: tcp
+        - IpProtocol: tcp # SMB 
           FromPort: 445
           ToPort: 445
-          CidrIp: 0.0.0.0/0 # SMB (optional, tighten if needed)
+          CidrIp: 0.0.0.0/0 
+        - IpProtocol: tcp # Allow dns tcp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp # Allow dns udp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0 # RDP 
         - IpProtocol: tcp
           FromPort: 3389
           ToPort: 3389
-          CidrIp: 0.0.0.0/0 # RDP (optional)
+          CidrIp: 0.0.0.0/0 
       VpcId: !Ref AWS::NoValue # Auto for default VPC
 
-  FileServerInstance:
+  FileServerDNSServerInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -54,7 +63,7 @@ Resources:
       IamInstanceProfile: LabInstanceProfile
       ImageId: !Ref WindowsAmi
       SecurityGroupIds:
-        - !Ref FileServerSG
+        - !Ref FileServerDNSServerSG
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -62,37 +71,52 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: FileServer
+          Value: FileServerDNSServer
         - Key: Environment
           Value: Development
       UserData:
         Fn::Base64: !Sub |
           <powershell>
+          # FileServer
+          Start-Transcript -Path "C:\FileServer.log" -Append
+          
           Install-WindowsFeature -Name FS-FileServer
           New-Item -Path "C:\FileShare" -ItemType Directory -Force
           New-SmbShare -Name "PublicShare" -Path "C:\FileShare" -FullAccess "Everyone"
           Write-Host "File Server setup complete."
+          
+          Stop-Transcript
+          
+          #DNSServer
+          Start-Transcript -Path "C:\DNSServer.log" -Append
+
+          Install-WindowsFeature DNS -IncludeManagementTools
+
+          Add-DnsServerPrimaryZone -Name "example.internal" -ZoneFile "example.internal.dns"
+          Add-DnsServerPrimaryZone -Name "devspeed.com" -ZoneFile "devspeed.com.dns"
+
+          Add-DnsServerResourceRecordA -Name 'server1' -ZoneName 'example.internal' -IPv4Address '10.0.1.10'
+          Add-DnsServerResourceRecordA -Name 'console' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.11'
+          Add-DnsServerResourceRecordA -Name 'go' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.29'
+          Add-DnsServerResourceRecordA -Name 'blog' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.30'
+          Add-DnsServerResourceRecordA -Name 'shop' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.31'
+          Add-DnsServerResourceRecordA -Name 'support' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.32'
+          Add-DnsServerResourceRecordA -Name 'mail' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.33'
+          Add-DnsServerResourceRecordA -Name 'www' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.34'
+          Add-DnsServerResourceRecordA -Name 'www2' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.100'
+
+          # For example, forwarding to Google DNS:
+          # Add-DnsServerForwarder -IPAddress "8.8.8.8" -PassThru
+          # Or forwarding to AWS VPC DNS (recommended for EC2). This is the Amazon-provided DNS resolver for VPCs.
+          # Add-DnsServerForwarder -IPAddress "169.254.169.253" -PassThru
+
+          New-NetFirewallRule -DisplayName "Allow DNS TCP 53" -Direction Inbound -Protocol TCP -LocalPort 53 -Action Allow
+          New-NetFirewallRule -DisplayName "Allow DNS UDP 53" -Direction Inbound -Protocol UDP -LocalPort 53 -Action Allow
+
+          Stop-Transcript
           </powershell>
-  # TestFileServerInstance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: !Ref InstanceType
-  #     KeyName: !Ref KeyName
-  #     IamInstanceProfile: LabInstanceProfile
-  #     ImageId: !Ref WindowsAmi
-  #     SecurityGroupIds:
-  #       - !Ref FileServerSG
-  #     BlockDeviceMappings:
-  #       - DeviceName: /dev/sda1
-  #         Ebs:
-  #           VolumeSize: 35
-  #           VolumeType: gp2
-  #     Tags:
-  #       - Key: Name
-  #         Value: TestFileServer
-  #       - Key: Environment
-  #         Value: Development
-  # end file server
+  
+  # end file server, dns server
 
   # begin proxy server
   ProxyServerSG:
@@ -639,84 +663,23 @@ Resources:
           Stop-Transcript
           </powershell>
   # end ftp server
-  # begin dns server
-  DNSServerSG:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow RDP access & dns
-      SecurityGroupIngress: # Allow RDP
-        - IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp # Allow dns tcp
-          FromPort: 53
-          ToPort: 53
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: udp # Allow dns udp
-          FromPort: 53
-          ToPort: 53
-          CidrIp: 0.0.0.0/0
-      VpcId: !Ref AWS::NoValue # default VPC
-
-  DNSServerInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyName
-      IamInstanceProfile: LabInstanceProfile
-      ImageId: !Ref WindowsAmi
-      SecurityGroupIds:
-        - !Ref DNSServerSG
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 35
-            VolumeType: gp2
-      Tags:
-        - Key: Name
-          Value: DNSServer
-        - Key: Environment
-          Value: Development
-      UserData:
-        Fn::Base64: !Sub |
-          <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
-
-          Install-WindowsFeature DNS -IncludeManagementTools
-
-          Add-DnsServerPrimaryZone -Name "example.internal" -ZoneFile "example.internal.dns"
-          Add-DnsServerPrimaryZone -Name "devspeed.com" -ZoneFile "devspeed.com.dns"
-
-          Add-DnsServerResourceRecordA -Name 'server1' -ZoneName 'example.internal' -IPv4Address '10.0.1.10'
-          Add-DnsServerResourceRecordA -Name 'console' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.11'
-          Add-DnsServerResourceRecordA -Name 'go' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.29'
-          Add-DnsServerResourceRecordA -Name 'blog' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.30'
-          Add-DnsServerResourceRecordA -Name 'shop' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.31'
-          Add-DnsServerResourceRecordA -Name 'support' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.32'
-          Add-DnsServerResourceRecordA -Name 'mail' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.33'
-          Add-DnsServerResourceRecordA -Name 'www' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.34'
-          Add-DnsServerResourceRecordA -Name 'www2' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.100'
-
-          # For example, forwarding to Google DNS:
-          # Add-DnsServerForwarder -IPAddress "8.8.8.8" -PassThru
-          # Or forwarding to AWS VPC DNS (recommended for EC2). This is the Amazon-provided DNS resolver for VPCs.
-          # Add-DnsServerForwarder -IPAddress "169.254.169.253" -PassThru
-
-          New-NetFirewallRule -DisplayName "Allow DNS TCP 53" -Direction Inbound -Protocol TCP -LocalPort 53 -Action Allow
-          New-NetFirewallRule -DisplayName "Allow DNS UDP 53" -Direction Inbound -Protocol UDP -LocalPort 53 -Action Allow
-
-          Stop-Transcript
-          </powershell>
-  # end dns server
+ 
 Outputs:
-  # file server
+  # file server #1
   FileServerPublicDNS:
     Description: File Server Public DNS
-    Value: !GetAtt FileServerInstance.PublicDnsName
+    Value: !GetAtt FileServerDNSServerInstance.PublicDnsName
   SharePath:
     Description: SMB Share Path
-    Value: "\\\\${FileServerInstance.PublicDnsName}\\PublicShare"
+    Value: "\\\\${FileServerDNSServerInstance.PublicDnsName}\\PublicShare"
+  
+  # dns server #3
+  DNSServerPublicIP:
+    Description: Public IP of DNS Server
+    Value: !GetAtt FileServerDNSServerInstance.PublicIp
+  DNSServerPublicDNS:
+    Description: DNS Server Public DNS
+    Value: !GetAtt FileServerDNSServerInstance.PublicDnsName
 
   # proxy server
   ProxyServerPublicDNS:
@@ -761,10 +724,3 @@ Outputs:
     Description: FTP Server Public DNS
     Value: !GetAtt FTPServerInstance.PublicDnsName
 
-  # dns server
-  DNSServerPublicIP:
-    Description: Public IP of DNS Server
-    Value: !GetAtt DNSServerInstance.PublicIp
-  DNSServerPublicDNS:
-    Description: DNS Server Public DNS
-    Value: !GetAtt DNSServerInstance.PublicDnsName
