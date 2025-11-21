@@ -478,6 +478,167 @@ Resources:
           Stop-Transcript
           </powershell>
   # end web server
+  # begin ftp server
+  MyEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  MyEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref FTPServerInstance
+      EIP: !Ref MyEIP
+  FTPServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow RDP access & ftp
+      SecurityGroupIngress: # Allow RDP
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow ftp
+          FromPort: 21
+          ToPort: 21
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow passive ftp
+          FromPort: 50000
+          ToPort: 51000
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref AWS::NoValue # default VPC
+
+  FTPServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref FTPServerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: FTPServer
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          Start-Transcript -Path "C:\userdata.log" -Append
+
+          #Install IIS Feature
+          Install-WindowsFeature -Name Web-Server -IncludeManagementTools
+
+          #Install FTP feature
+          Install-WindowsFeature -Name Web-Ftp-Server -IncludeAllSubFeature -IncludeManagementTools -Verbose
+
+          #Creating new FTP site
+          $SiteName = "Demo FTP Site"
+          $RootFolderpath = "C:\inetpub\ftproot"
+          $PortNumber = 21
+          $FTPUserGroupName = "Demo FTP Users Group"
+          $FTPUserName = "jame"
+          $FTPPassword = ConvertTo-SecureString "Mypassword@2025" -AsPlainText -Force
+
+          if (!(Test-Path $RootFolderpath)) {
+              # if the folder doesn't exist
+              New-Item -Path $RootFolderpath -ItemType Directory # create the folder
+          }
+
+          New-WebFtpSite -Name $SiteName -PhysicalPath $RootFolderpath -Port $PortNumber -Verbose -Force
+
+          #Creating the local Windows group
+          if (!(Get-LocalGroup $FTPUserGroupName  -ErrorAction SilentlyContinue)) {
+              #if the group doesn't exist
+              New-LocalGroup -Name $FTPUserGroupName `
+                  -Description "Members of this group can connect to FTP server" #create the group
+          }
+
+          # Creating an FTP user
+          If (!(Get-LocalUser $FTPUserName -ErrorAction SilentlyContinue)) {
+              New-LocalUser -Name $FTPUserName -Password $FTPPassword `
+                  -Description "User account to access FTP server" `
+                  -UserMayNotChangePassword
+          }
+
+          # Add the created FTP user to the group Demo FTP Users Group
+          Add-LocalGroupMember -Name $FTPUserGroupName -Member $FTPUserName -ErrorAction SilentlyContinue
+
+          # Enabling basic authentication on the FTP site
+          $param = @{
+              Path    = 'IIS:\Sites\Demo FTP Site'
+              Name    = 'ftpserver.security.authentication.basicauthentication.enabled'
+              Value   = $true
+              Verbose = $True
+          }
+          Set-ItemProperty @param
+
+          # Adding authorization rule to allow FTP users
+          # in the FTP group to access the FTP site
+          $param = @{
+              PSPath   = 'IIS:\'
+              Location = $SiteName
+              Filter   = '/system.ftpserver/security/authorization'
+          #    Value    = @{ accesstype = 'Allow'; roles = $FTPUserGroupName; permissions = 1 }
+              Value    = @{ accesstype = 'Allow'; roles = $FTPUserGroupName; permissions = 3 }
+          }
+
+          Add-WebConfiguration @param
+
+          # Changing SSL policy of the FTP site
+          'ftpServer.security.ssl.controlChannelPolicy', 'ftpServer.security.ssl.dataChannelPolicy' |
+          ForEach-Object {
+              Set-ItemProperty -Path "IIS:\Sites\Demo FTP Site" -Name $_ -Value $false
+          }
+
+          # can be 'ReadAndExecute', 'Modify'
+          $ACLObject = Get-Acl -Path $RootFolderpath
+          $ACLObject.SetAccessRule(
+              ( # Access rule object
+                  New-Object System.Security.AccessControl.FileSystemAccessRule(
+                      $FTPUserGroupName,
+                      'FullControl',
+                      'ContainerInherit,ObjectInherit',
+                      'None',
+                      'Allow'
+                  )
+              )
+          )
+          Set-Acl -Path $RootFolderpath -AclObject $ACLObject
+
+          # Checking the NTFS permissions on the FTP root folder
+          Get-Acl -Path $RootFolderpath | ForEach-Object Access
+
+          # Test FTP Port and FTP access
+          Test-NetConnection -ComputerName localhost -Port 21
+
+
+          Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.ftpServer/firewallSupport" -name "lowDataChannelPort" -value 50000
+          Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.ftpServer/firewallSupport" -name "highDataChannelPort" -value 51000
+
+          Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.applicationHost/sites/site[@name='Demo FTP Site']/ftpServer/firewallSupport" -name "externalIp4Address" -value "${MyEIP}"
+
+          # Control port
+          New-NetFirewallRule -DisplayName "Allow FTP 21" -Direction Inbound -Protocol TCP -LocalPort 21 -Action Allow
+
+          # Passive ports
+          New-NetFirewallRule -DisplayName "Allow FTP Passive Ports" -Direction Inbound -Protocol TCP -LocalPort 50000-51000 -Action Allow
+
+          Restart-Service FTPSVC
+          
+          # C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch380802110\UserScript.ps1
+          # apple
+          
+          echo hello > "C:\inetpub\ftproot\hello.txt"
+
+          Stop-Transcript
+          </powershell>
+  # end ftp server
 Outputs:
   # file server
   FileServerPublicDNS:
