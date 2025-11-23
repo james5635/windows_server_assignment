@@ -215,19 +215,35 @@ Resources:
 
   # end proxy server, dhcp server
 
-  # begin terminal server
-  TerminalServerSG:
+  # begin terminal server, vpn server #6 #5
+  TerminalServerVPNServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow RDP access for Terminal Server
+      GroupDescription: Allow RDP access for Terminal Server, VPN
       SecurityGroupIngress:
-        - IpProtocol: tcp
+        - IpProtocol: tcp # Allow RDP
           FromPort: 3389
           ToPort: 3389
-          CidrIp: 0.0.0.0/0 # Allow RDP
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow VPN-SSTP
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp # Allow VPN-IKEv2-500
+          FromPort: 500
+          ToPort: 500
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp # Allow VPN-IKEv2-4500
+          FromPort: 4500
+          ToPort: 4500
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp # Allow VPN-L2TP
+          FromPort: 1701
+          ToPort: 1701
+          CidrIp: 0.0.0.0/0
       VpcId: !Ref AWS::NoValue # default VPC
 
-  TerminalServerInstance:
+  TerminalServerVPNServerInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -235,7 +251,7 @@ Resources:
       IamInstanceProfile: LabInstanceProfile
       ImageId: !Ref WindowsAmi
       SecurityGroupIds:
-        - !Ref TerminalServerSG
+        - !Ref TerminalServerVPNServerSG
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -243,13 +259,14 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: TerminalServer
+          Value: TerminalServerVPNServer
         - Key: Environment
           Value: Development
       UserData:
         Fn::Base64: !Sub |
           <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
+          # terminal server
+          Start-Transcript -Path "C:\TerminalServer.log" -Append
 
           # Install Remote Desktop Session Host Role
           Install-WindowsFeature RDS-RD-Server
@@ -263,27 +280,68 @@ Resources:
           Write-Host "Terminal Server (RDS Session Host) setup complete."
 
           Stop-Transcript
+
+          # vpn server
+          Start-Transcript -Path "C:\VPNServer.log" -Append
+
+          Install-WindowsFeature RemoteAccess -IncludeManagementTools
+          Install-WindowsFeature DirectAccess-VPN -IncludeManagementTools
+          Install-WindowsFeature Routing -IncludeManagementTools
+
+          # Install and configure Remote Access as a VPN server
+          Install-RemoteAccess -VpnType Vpn
+
+          # Start the Remote Access service
+          Set-Service RemoteAccess -StartupType Automatic
+          Start-Service RemoteAccess
+
+          $startIP = "10.10.10.1"
+          $endIP = "10.10.10.50"
+
+          netsh ras ip add range from = $startIP to = $endIP
+          netsh ras ip set addrassign method = pool
+
+          # Enable SSTP, IKEv2, and L2TP
+          Set-VpnServerConfiguration -SstpPorts 5 -IkeV2Ports 5 -L2tpPorts 5
+
+          # Set the pre-shared key
+          Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\RasMan\Parameters" -Name "ProhibitIpSec" -Value 0
+          New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\RasMan\PPP" -Name "ForceEncryptedPassword" -Value 2 -PropertyType DWORD -Force
+
+          # Restart services
+          Restart-Service RemoteAccess
+
+          # SSTP (TCP 443)
+          New-NetFirewallRule -DisplayName "VPN-SSTP" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow
+
+          # IKEv2 (UDP 500 and 4500)
+          New-NetFirewallRule -DisplayName "VPN-IKEv2-500" -Direction Inbound -Protocol UDP -LocalPort 500 -Action Allow
+          New-NetFirewallRule -DisplayName "VPN-IKEv2-4500" -Direction Inbound -Protocol UDP -LocalPort 4500 -Action Allow
+
+          # L2TP (UDP 1701)
+          New-NetFirewallRule -DisplayName "VPN-L2TP" -Direction Inbound -Protocol UDP -LocalPort 1701 -Action Allow
+
+          # For AD single user
+          # Set-ADUser -Identity "Administrator" -Replace @{msNPAllowDialin=$true}
+          
+          # For local single user
+          netsh ras set user "Administrator" permit
+          
+          # Enable IP routing
+          Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "IPEnableRouter" -Value 1
+
+          # Get your external network adapter name (the one connected to the internet)
+          Get-NetAdapter
+
+          # Install NAT on the external interface
+          netsh routing ip nat install
+          netsh routing ip nat add interface name="Ethernet 3" mode=full
+          Restart-Service RemoteAccess
+
+          Stop-Transcript
+
           </powershell>
 
-  # TestTerminalServerInstance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: !Ref InstanceType
-  #     KeyName: !Ref KeyName
-  #     IamInstanceProfile: LabInstanceProfile
-  #     ImageId: !Ref WindowsAmi
-  #     SecurityGroupIds:
-  #       - !Ref TerminalServerSG
-  #     BlockDeviceMappings:
-  #       - DeviceName: /dev/sda1
-  #         Ebs:
-  #           VolumeSize: 35
-  #           VolumeType: gp2
-  #     Tags:
-  #       - Key: Name
-  #         Value: TestTerminalServer
-  #       - Key: Environment
-  #         Value: Development
   # end terminal server
 
   # begin database server
@@ -714,26 +772,26 @@ Outputs:
   # proxy server #2
   ProxyServerPublicDNS:
     Description: Proxy Server Public DNS
-    Value: !GetAtt ProxyServerDHCPServerSG.PublicDnsName
+    Value: !GetAtt ProxyServerDHCPServerInstance.PublicDnsName
   ProxyServerPrivateIP:
     Description: Proxy Server Private IP
-    Value: !GetAtt ProxyServerDHCPServerSG.PrivateIp
+    Value: !GetAtt ProxyServerDHCPServerInstance.PrivateIp
 
   # dhcp server #4
   DHCPPublicDNS:
     Description: DHCP Server Public DNS
-    Value: !GetAtt ProxyServerDHCPServerSG.PublicDnsName
+    Value: !GetAtt ProxyServerDHCPServerInstance.PublicDnsName
   DHCPPrivateIP:
     Description: DHCP Server Private IP
-    Value: !GetAtt ProxyServerDHCPServerSG.PrivateIp
+    Value: !GetAtt ProxyServerDHCPServerInstance.PrivateIp
 
   # terminal server
   TerminalServerPublicIP:
     Description: Public IP of Terminal Server
-    Value: !GetAtt TerminalServerInstance.PublicIp
+    Value: !GetAtt TerminalServerVPNServerInstance.PublicIp
   RDPConnection:
     Description: Use this to connect via Remote Desktop
-    Value: !Sub "RDP to: ${TerminalServerInstance.PublicDnsName}"
+    Value: !Sub "RDP to: ${TerminalServerVPNServerInstance.PublicDnsName}"
 
   # database server
   PostgreSQLPublicIP:
