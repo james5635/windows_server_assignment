@@ -1,5 +1,5 @@
-# 8 limited EC2 instances
-# More EC2 instances will be => Resource of type 'AWS::EC2::Instance' with identifier 'i-02a8fa59debaa1806' did not stabilize." mean we run many ec2 instances.
+# 8 limited EC2 instances. 
+# More EC2 instances will be error => "Resource of type 'AWS::EC2::Instance' with identifier 'i-02a8fa59debaa1806' did not stabilize."
 AWSTemplateFormatVersion: "2010-09-09"
 Description: 15 Windows Server on AWS Cloud
 
