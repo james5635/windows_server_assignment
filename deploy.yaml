@@ -1,4 +1,5 @@
 # 8 limited EC2 instances
+# More EC2 instances will be => Resource of type 'AWS::EC2::Instance' with identifier 'i-02a8fa59debaa1806' did not stabilize." mean we run many ec2 instances.
 AWSTemplateFormatVersion: "2010-09-09"
 Description: 15 Windows Server on AWS Cloud
 
@@ -342,10 +343,9 @@ Resources:
 
           </powershell>
 
-  # end terminal server
+  # end terminal server, vpn server
 
   # begin database server
-  # Resource of type 'AWS::EC2::Instance' with identifier 'i-02a8fa59debaa1806' did not stabilize." mean we run many ec2 instances.
   DatabaseServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -519,8 +519,8 @@ Resources:
 
   # end database server
 
-  # begin web server
-  WebServerSG:
+  # begin web server, mail server #7 #8
+  WebServerMailServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow RDP access & http(s) & mail
@@ -547,7 +547,7 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref AWS::NoValue # default VPC
 
-  WebServerInstance:
+  WebServerMailServerInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -555,7 +555,7 @@ Resources:
       IamInstanceProfile: LabInstanceProfile
       ImageId: !Ref WindowsAmi
       SecurityGroupIds:
-        - !Ref WebServerSG
+        - !Ref WebServerMailServerSG
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -563,7 +563,7 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: WebServer
+          Value: WebServerMailServer
         - Key: Environment
           Value: Development
       UserData:
@@ -586,12 +586,29 @@ Resources:
           Start-Transcript -Path "C:\MailServer.log" -Append
 
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-          choco install openjdk strawberryperl thunderbird notepadplusplus -y
+          choco install openjdk strawberryperl thunderbird notepadplusplus telnet -y
           Invoke-WebRequest https://www.jetmore.org/john/code/swaks/files/swaks-20240103.0/swaks -OutFile swaks.pl
           Invoke-WebRequest https://dlcdn.apache.org/james/server/3.9.0/james-server-spring-app-3.9.0-app.zip -OutFile james-server-spring-app-3.9.0-app.zip
           Expand-Archive james-server-spring-app-3.9.0-app.zip -DestinationPath james-server-spring-app-3.9.0-app
-          # & "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james" install
-          # & "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james" start
+
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/smtpserver.xml -OutFile "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\conf\smtpserver.xml"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/imapserver.xml -OutFile "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\conf\imapserver.xml"
+
+          Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+          refreshenv
+
+          $cur = $PWD.Path
+          cd "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\"
+
+          .\james install
+          .\james start
+          .\james-cli adddomain example.local
+          .\james-cli adduser mike@example.local mike
+          .\james-cli adduser joe@example.local joe
+          .\james-cli adduser leng@example.local leng
+          .\james-cli adduser jame@example.local jame
+
+          cd $cur
 
           New-NetFirewallRule -DisplayName "Allow smtp 25" -Direction Inbound -Protocol TCP -LocalPort 25 -Action Allow
           New-NetFirewallRule -DisplayName "Allow imap 143" -Direction Inbound -Protocol TCP -LocalPort 143 -Action Allow
@@ -599,7 +616,7 @@ Resources:
 
           Stop-Transcript
           </powershell>
-  # end web server
+  # end web server, mail server
   # begin ftp server
   MyEIP:
     Type: AWS::EC2::EIP
@@ -817,10 +834,18 @@ Outputs:
   # web server
   WebServerPublicIP:
     Description: Public IP of Web Server
-    Value: !GetAtt WebServerInstance.PublicIp
+    Value: !GetAtt WebServerMailServerInstance.PublicIp
   WebServerPublicDNS:
     Description: Web Server Public DNS
-    Value: !GetAtt WebServerInstance.PublicDnsName
+    Value: !GetAtt WebServerMailServerInstance.PublicDnsName
+
+  # mail server
+  MailServerPublicIP:
+    Description: Public IP of Mail Server
+    Value: !GetAtt WebServerMailServerInstance.PublicIp
+  MailServerPublicDNS:
+    Description: Mail Server Public DNS
+    Value: !GetAtt WebServerMailServerInstance.PublicDnsName
 
   # ftp server
   FTPServerPublicIP:
