@@ -1,4 +1,4 @@
-# 8 limited EC2 instances. 
+# 8 limited EC2 instances.
 # More EC2 instances will be error => "Resource of type 'AWS::EC2::Instance' with identifier 'i-02a8fa59debaa1806' did not stabilize."
 AWSTemplateFormatVersion: "2010-09-09"
 Description: 15 Windows Server on AWS Cloud
@@ -597,22 +597,22 @@ Resources:
           Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
           refreshenv
 
-          $cur = $PWD.Path
-          cd "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\"
+          # cd "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\"
 
-          .\james install
-          .\james start
-          .\james-cli adddomain example.local
-          .\james-cli adduser mike@example.local mike
-          .\james-cli adduser joe@example.local joe
-          .\james-cli adduser leng@example.local leng
-          .\james-cli adduser jame@example.local jame
+          $james = "C:\Windows\System32\james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james.bat"
+          $james_cli = "C:\Windows\System32\james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james-cli.ps1"
 
-          cd $cur
+          & $james install
+          & $james start
+          & $james_cli -username james-admin -password changeme adddomain example.local
+          & $james_cli -username james-admin -password changeme adduser mike@example.local mike
+          & $james_cli -username james-admin -password changeme adduser joe@example.local joe
+          & $james_cli -username james-admin -password changeme adduser leng@example.local leng
+          & $james_cli -username james-admin -password changeme adduser jame@example.local jame
+
 
           New-NetFirewallRule -DisplayName "Allow smtp 25" -Direction Inbound -Protocol TCP -LocalPort 25 -Action Allow
           New-NetFirewallRule -DisplayName "Allow imap 143" -Direction Inbound -Protocol TCP -LocalPort 143 -Action Allow
-
 
           Stop-Transcript
           </powershell>
