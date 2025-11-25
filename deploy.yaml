@@ -292,7 +292,7 @@ Resources:
           Install-RemoteAccess -VpnType Vpn
 
           # Start the Remote Access service
-          Set-Service RemoteAccess -StartupType Automatic
+          # Set-Service RemoteAccess -StartupType Automatic
           Start-Service RemoteAccess
 
           $startIP = "10.10.10.1"
@@ -323,10 +323,10 @@ Resources:
 
           # For AD single user
           # Set-ADUser -Identity "Administrator" -Replace @{msNPAllowDialin=$true}
-          
+
           # For local single user
           netsh ras set user "Administrator" permit
-          
+
           # Enable IP routing
           Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "IPEnableRouter" -Value 1
 
@@ -517,32 +517,13 @@ Resources:
           Stop-Transcript
           </powershell>
 
-  # TestDatabaseServerInstance:
-  #   Type: AWS::EC2::Instance
-  #   Properties:
-  #     InstanceType: !Ref InstanceType
-  #     KeyName: !Ref KeyName
-  #     IamInstanceProfile: LabInstanceProfile
-  #     ImageId: !Ref WindowsAmi
-  #     SecurityGroupIds:
-  #       - !Ref TerminalServerSG
-  #     BlockDeviceMappings:
-  #       - DeviceName: /dev/sda1
-  #         Ebs:
-  #           VolumeSize: 35
-  #           VolumeType: gp2
-  #     Tags:
-  #       - Key: Name
-  #         Value: TestDatabaseServer
-  #       - Key: Environment
-  #         Value: Development
   # end database server
 
   # begin web server
   WebServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow RDP access & http(s)
+      GroupDescription: Allow RDP access & http(s) & mail
       SecurityGroupIngress: # Allow RDP
         - IpProtocol: tcp
           FromPort: 3389
@@ -555,6 +536,14 @@ Resources:
         - IpProtocol: tcp # Allow https
           FromPort: 443
           ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow smtp
+          FromPort: 25
+          ToPort: 25
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # Allow imap
+          FromPort: 143
+          ToPort: 143
           CidrIp: 0.0.0.0/0
       VpcId: !Ref AWS::NoValue # default VPC
 
@@ -580,12 +569,33 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
+          # web server
+          Start-Transcript -Path "C:\WebServer.log" -Append
 
           Install-WindowsFeature -Name Web-Server -IncludeManagementTools
           # Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
           # Install-WindowsFeature -Name Web-Mgmt-Console
           Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/static/devspeed.html -OutFile "C:\inetpub\wwwroot\index.html"
+
+          Stop-Transcript
+
+          # mail server
+          # - apache james (smpt server [port: 25], imap server [port: 143])
+          # - swaks (smpt client)
+          # - thunderbird (email client)
+          Start-Transcript -Path "C:\MailServer.log" -Append
+
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install openjdk strawberryperl thunderbird notepadplusplus -y
+          Invoke-WebRequest https://www.jetmore.org/john/code/swaks/files/swaks-20240103.0/swaks -OutFile swaks.pl
+          Invoke-WebRequest https://dlcdn.apache.org/james/server/3.9.0/james-server-spring-app-3.9.0-app.zip -OutFile james-server-spring-app-3.9.0-app.zip
+          Expand-Archive james-server-spring-app-3.9.0-app.zip -DestinationPath james-server-spring-app-3.9.0-app
+          # & "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james" install
+          # & "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james" start
+
+          New-NetFirewallRule -DisplayName "Allow smtp 25" -Direction Inbound -Protocol TCP -LocalPort 25 -Action Allow
+          New-NetFirewallRule -DisplayName "Allow imap 143" -Direction Inbound -Protocol TCP -LocalPort 143 -Action Allow
+
 
           Stop-Transcript
           </powershell>
