@@ -697,7 +697,8 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
+          # ftp server
+          Start-Transcript -Path "C:\FtpServer.log" -Append
 
           #Install IIS Feature
           Install-WindowsFeature -Name Web-Server -IncludeManagementTools
@@ -805,6 +806,27 @@ Resources:
           echo hello > "C:\inetpub\ftproot\hello.txt"
 
           Stop-Transcript
+          
+          # backup server
+          Start-Transcript -Path "C:\BackupServer.log" -Append
+          
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install awscli -y
+          
+          Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+          refreshenv
+          
+          $bucket = (New-Guid).ToString()
+          echo $bucket > "C:\bucket.txt"
+          
+          Invoke-WebRequest <url> -OutFile "C:\S3Backup.ps1"
+          Invoke-WebRequest <url> -OutFile "C:\S3BackupSchedule.ps1"
+          Invoke-WebRequest <url> -OutFile "C:\S3BackupScheduleNightly.ps1"
+          
+          & "C:\S3BackupSchedule.ps1"
+          
+          Stop-Transcript
+          
           </powershell>
   # end ftp server
 
