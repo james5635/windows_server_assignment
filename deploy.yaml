@@ -795,6 +795,63 @@ Resources:
           </powershell>
   # end ftp server, backup server
 
+  
+  # begin docker, load balancing
+  
+  DockerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow RDP access & ftp
+      SecurityGroupIngress: # Allow RDP
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # allow http
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref AWS::NoValue # default VPC
+
+  DockerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref DockerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: Docker
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          
+          # additional web server for load balancing
+          Start-Transcript -Path "C:\WebServer.log" -Append
+          Install-WindowsFeature -Name Web-Server
+          # echo "Server 1" > C:\inetpub\wwwroot\index.html
+          Stop-Transcript
+          
+          # docker
+          Start-Transcript -Path "C:\Docker.log" -Append
+          Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/Windows-Containers/Main/helpful_tools/Install-DockerCE/install-docker-ce.ps1" -o install-docker-ce.ps1
+          .\install-docker-ce.ps1
+          # will restart the machine
+          Stop-Transcript
+          
+          </powershell>
+  # end docker, load balancing
+
 Outputs:
   # file server #1
   FileServerPublicDNS:
