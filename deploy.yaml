@@ -369,7 +369,7 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref AWS::NoValue # default VPC
 
-  PostgreSQLInstance:
+  DatabaseInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -385,13 +385,15 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: PostgreSQL
+          Value: Database
         - Key: Environment
           Value: Development
       UserData:
         Fn::Base64: !Sub |
           <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
+          
+          # postgresql
+          Start-Transcript -Path "C:\postgresql.log" -Append
 
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           # username postgres
@@ -404,30 +406,9 @@ Resources:
             -Action Allow
 
           Stop-Transcript
-          </powershell>
-  SQLServerInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyName
-      IamInstanceProfile: LabInstanceProfile
-      ImageId: !Ref WindowsAmi
-      SecurityGroupIds:
-        - !Ref DatabaseServerSG
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 35
-            VolumeType: gp2
-      Tags:
-        - Key: Name
-          Value: SQLServer
-        - Key: Environment
-          Value: Development
-      UserData:
-        Fn::Base64: !Sub |
-          <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
+          
+          # sql server
+          Start-Transcript -Path "C:\sql_server.log" -Append
 
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install mssqlserver2014express -y
@@ -478,30 +459,9 @@ Resources:
             -Action Allow
 
           Stop-Transcript
-          </powershell>
-  MongoDBInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyName
-      IamInstanceProfile: LabInstanceProfile
-      ImageId: !Ref WindowsAmi
-      SecurityGroupIds:
-        - !Ref DatabaseServerSG
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 35
-            VolumeType: gp2
-      Tags:
-        - Key: Name
-          Value: MongoDB
-        - Key: Environment
-          Value: Development
-      UserData:
-        Fn::Base64: !Sub |
-          <powershell>
-          Start-Transcript -Path "C:\userdata.log" -Append
+          
+          # mongodb 
+          Start-Transcript -Path "C:\mongodb.log" -Append
 
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install mongodb -y
@@ -515,8 +475,9 @@ Resources:
             -Action Allow
 
           Stop-Transcript
+          
           </powershell>
-
+          
   # end database server
 
   # begin web server, mail server #7 #8
@@ -878,13 +839,13 @@ Outputs:
   # database server #9
   PostgreSQLPublicIP:
     Description: Public IP of PostgreSQL
-    Value: !GetAtt PostgreSQLInstance.PublicIp
+    Value: !GetAtt DatabaseInstance.PublicIp
   SQLServerPublicIP:
     Description: Public IP of SQLServer with port 1433
-    Value: !GetAtt SQLServerInstance.PublicIp
+    Value: !GetAtt DatabaseInstance.PublicIp
   MongoDBPublicIP:
     Description: Public IP of MongoDB
-    Value: !GetAtt MongoDBInstance.PublicIp
+    Value: !GetAtt DatabaseInstance.PublicIp
 
   # web server #7
   WebServerPublicIP:
