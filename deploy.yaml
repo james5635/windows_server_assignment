@@ -603,9 +603,36 @@ Resources:
           $james_cli = "C:\Windows\System32\james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james-cli.ps1"
 
           Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/james-cli.ps1 -OutFile $james_cli
+          
+          function Wait-JamesReady {
+              param(
+                  [int]$Port = 9999,
+                  [string]$Url = "localhost",
+                  [int]$TimeoutSeconds = 120
+              )
+          
+              $start = Get-Date
+          
+              Write-Host "Waiting for James server to open JMX on port $Port..."
+          
+              while ((Get-Date) -lt $start.AddSeconds($TimeoutSeconds)) {
+                  if ((Test-NetConnection -ComputerName $Url -Port $Port -WarningAction SilentlyContinue).TcpTestSucceeded) {
+                      Write-Host "James server is ready!"
+                      return
+                  }
+          
+                  Start-Sleep -Seconds 2
+              }
+          
+              throw "Timeout: James server did not open JMX port $Port"
+          }
 
           & $james install
           & $james start
+          
+          # need to wait james server completely ready
+          Wait-JamesReady
+          
           & $james_cli -username james-admin -password changeme adddomain example.local
           & $james_cli -username james-admin -password changeme adduser mike@example.local mike
           & $james_cli -username james-admin -password changeme adduser joe@example.local joe
