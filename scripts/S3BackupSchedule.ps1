@@ -4,7 +4,7 @@
 $ScriptPath = "C:\S3Backup.ps1"    
 $TaskName = "S3Backup"
 $TaskDescription = "Sync local folder to S3 bucket"
-$Time = 2
+$Time = 1
 # -------------------------------
 # Create the action
 # -------------------------------

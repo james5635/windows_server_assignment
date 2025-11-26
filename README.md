@@ -31,7 +31,7 @@ LLMs - Large Language Model  (Fine Tuner)
 7. Web Server ✅
 8. Mail Server ✅
 9. Database Server (MongoDB ✅, Oracle, SQL Server ✅, PostgreSQL ✅)
-10. Backup Server
+10. Backup Server ✅
 11. Load Balancing
 12. Failover Cluster
 13. FTP Server ✅
@@ -39,3 +39,12 @@ LLMs - Large Language Model  (Fine Tuner)
 15. Domain Controller
 
 LLMs - Large Language Model (Fine Tuner)
+
+# Usage
+
+10. Backup Server
+    - backup "C:\inetpub" to s3 bucket every 1 minute and every night at 2 a.m.
+13. FTP Server
+    - use filezilla (port 21)
+    - username: jame
+    - password: Mypassword@2025

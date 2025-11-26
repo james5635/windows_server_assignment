@@ -646,7 +646,8 @@ Resources:
           Stop-Transcript
           </powershell>
   # end web server, mail server
-  # begin ftp server
+  
+  # begin ftp server, backup servcer #13 #10
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
@@ -654,9 +655,9 @@ Resources:
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      InstanceId: !Ref FTPServerInstance
+      InstanceId: !Ref FTPServerBackupServerInstance
       EIP: !Ref MyEIP
-  FTPServerSG:
+  FTPServerBackupServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow RDP access & ftp
@@ -675,7 +676,7 @@ Resources:
           CidrIp: 0.0.0.0/0
       VpcId: !Ref AWS::NoValue # default VPC
 
-  FTPServerInstance:
+  FTPServerBackupServerInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -683,7 +684,7 @@ Resources:
       IamInstanceProfile: LabInstanceProfile
       ImageId: !Ref WindowsAmi
       SecurityGroupIds:
-        - !Ref FTPServerSG
+        - !Ref FTPServerBackupServerSG
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
@@ -691,7 +692,7 @@ Resources:
             VolumeType: gp2
       Tags:
         - Key: Name
-          Value: FTPServer
+          Value: FTPServerBackupServer
         - Key: Environment
           Value: Development
       UserData:
@@ -831,7 +832,7 @@ Resources:
           Stop-Transcript
           
           </powershell>
-  # end ftp server
+  # end ftp server, backup server
 
 Outputs:
   # file server #1
@@ -866,7 +867,7 @@ Outputs:
     Description: DHCP Server Private IP
     Value: !GetAtt ProxyServerDHCPServerInstance.PrivateIp
 
-  # terminal server
+  # terminal server #6
   TerminalServerPublicIP:
     Description: Public IP of Terminal Server
     Value: !GetAtt TerminalServerVPNServerInstance.PublicIp
@@ -874,7 +875,7 @@ Outputs:
     Description: Use this to connect via Remote Desktop
     Value: !Sub "RDP to: ${TerminalServerVPNServerInstance.PublicDnsName}"
 
-  # database server
+  # database server #9
   PostgreSQLPublicIP:
     Description: Public IP of PostgreSQL
     Value: !GetAtt PostgreSQLInstance.PublicIp
@@ -885,7 +886,7 @@ Outputs:
     Description: Public IP of MongoDB
     Value: !GetAtt MongoDBInstance.PublicIp
 
-  # web server
+  # web server #7
   WebServerPublicIP:
     Description: Public IP of Web Server
     Value: !GetAtt WebServerMailServerInstance.PublicIp
@@ -893,7 +894,7 @@ Outputs:
     Description: Web Server Public DNS
     Value: !GetAtt WebServerMailServerInstance.PublicDnsName
 
-  # mail server
+  # mail server #8
   MailServerPublicIP:
     Description: Public IP of Mail Server
     Value: !GetAtt WebServerMailServerInstance.PublicIp
@@ -901,10 +902,18 @@ Outputs:
     Description: Mail Server Public DNS
     Value: !GetAtt WebServerMailServerInstance.PublicDnsName
 
-  # ftp server
+  # ftp server #13
   FTPServerPublicIP:
     Description: Public IP of FTP Server
-    Value: !GetAtt FTPServerInstance.PublicIp
+    Value: !GetAtt FTPServerBackupServerInstance.PublicIp
   FTPServerPublicDNS:
     Description: FTP Server Public DNS
-    Value: !GetAtt FTPServerInstance.PublicDnsName
+    Value: !GetAtt FTPServerBackupServerInstance.PublicDnsName
+    
+  # backup server #10
+  BackupServerPublicIP:
+    Description: Public IP of Backup Server
+    Value: !GetAtt FTPServerBackupServerInstance.PublicIp
+  BackupServerPublicDNS:
+    Description: Backup Server Public DNS
+    Value: !GetAtt FTPServerBackupServerInstance.PublicDnsName
