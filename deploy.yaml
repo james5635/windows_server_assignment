@@ -826,6 +826,7 @@ Resources:
           Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/S3BackupScheduleNightly.ps1 -OutFile "C:\S3BackupScheduleNightly.ps1"
           
           & "C:\S3BackupSchedule.ps1"
+          & "C:\S3BackupScheduleNightly.ps1"
           
           Stop-Transcript
           
