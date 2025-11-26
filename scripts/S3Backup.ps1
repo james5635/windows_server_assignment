@@ -4,7 +4,7 @@
 
 # Variables
 $LocalFolder = "C:\inetpub"          
-$S3Bucket = "s3://" + (cat bucket.txt) 
+$S3Bucket = "s3://" + (cat C:\bucket.txt) 
 $LogFile = "C:\BackupLogs\S3Backup.log"
 
 # Ensure log folder exists

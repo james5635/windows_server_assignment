@@ -11,9 +11,9 @@ $Time = 2
 $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$ScriptPath`""
 
 # -------------------------------
-# Create the trigger (repeat every 2 minutes)
+# Create the trigger 
 # -------------------------------
-$Trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $Time) -RepetitionDuration ([TimeSpan]::MaxValue)
+$Trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes $Time) 
 
 # -------------------------------
 # Optional: Run with highest privileges
