@@ -819,9 +819,9 @@ Resources:
           $bucket = (New-Guid).ToString()
           echo $bucket > "C:\bucket.txt"
           
-          Invoke-WebRequest <url> -OutFile "C:\S3Backup.ps1"
-          Invoke-WebRequest <url> -OutFile "C:\S3BackupSchedule.ps1"
-          Invoke-WebRequest <url> -OutFile "C:\S3BackupScheduleNightly.ps1"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/S3Backup.ps1 -OutFile "C:\S3Backup.ps1"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/S3BackupSchedule.ps1 -OutFile "C:\S3BackupSchedule.ps1"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/S3BackupScheduleNightly.ps1 -OutFile "C:\S3BackupScheduleNightly.ps1"
           
           & "C:\S3BackupSchedule.ps1"
           

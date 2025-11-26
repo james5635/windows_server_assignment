@@ -1,7 +1,7 @@
 # -------------------------------
 # Variables
 # -------------------------------
-$ScriptPath = "C:\Scripts\S3Backup.ps1"    # Path to your backup script
+$ScriptPath = "C:\S3Backup.ps1"   
 $TaskName = "S3BackupNightly"
 $TaskDescription = "Sync local folder to S3 bucket every night at 2 AM"
 $TriggerTime = "02:00"                      # 24-hour format
