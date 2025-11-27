@@ -802,7 +802,7 @@ Resources:
   DockerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow RDP access & ftp
+      GroupDescription: Allow RDP access & http
       SecurityGroupIngress: # Allow RDP
         - IpProtocol: tcp
           FromPort: 3389
@@ -852,6 +852,70 @@ Resources:
           
           </powershell>
   # end docker, load balancing
+
+  # begin domain controller, failover cluster #15 #12
+  # https://youtu.be/-4z-5dSvRoE?si=3HVHD9stgbfQgF_2 => How to allow RDP Access to a Domain Controller for Non-admin Users
+  # allow all tcp, all udp, all icmp => other windows ec2 can join domain
+  DomainControllerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow RDP access, all tcp, all udp, all icmp
+      SecurityGroupIngress: # Allow RDP
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # allow http
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp # All TCP ports
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp # All UDP ports
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp # All ICMP
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref AWS::NoValue # default VPC
+
+  DomainControllerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: LabInstanceProfile
+      ImageId: !Ref WindowsAmi
+      SecurityGroupIds:
+        - !Ref DomainControllerSG
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 35
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: DomainController
+        - Key: Environment
+          Value: Development
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          
+          # domain controller
+          Start-Transcript -Path "C:\DomainController.log" -Append
+          Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+          Install-ADDSForest -DomainName "example.local" -InstallDNS -SafeModeAdministratorPassword (ConvertTo-SecureString "Mypassword@2025" -AsPlainText -Force) -NoRebootOnCompletion -Force  
+          # Get-Service adws,kdc,netlogon,dns
+          Restart-Computer
+          Stop-Transcript
+         
+          </powershell>
+  # end domain controller, failover cluster
 
 Outputs:
   # file server #1
@@ -944,3 +1008,11 @@ Outputs:
   DockerPublicDNS:
     Description: Docker Public DNS
     Value: !GetAtt DockerInstance.PublicDnsName
+    
+  # domain controller #15
+  DomainControllerPublicIP:
+    Description: Public IP of Domain Controller
+    Value: !GetAtt DomainControllerInstance.PublicIp
+  DomainControllerPublicDNS:
+    Description: Domain Controller Public DNS
+    Value: !GetAtt DomainControllerInstance.PublicDnsName
