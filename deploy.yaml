@@ -81,15 +81,14 @@ Resources:
           <powershell>
           # FileServer
           Start-Transcript -Path "C:\FileServer.log" -Append
-
           Install-WindowsFeature -Name FS-FileServer
           New-Item -Path "C:\FileShare" -ItemType Directory -Force
           New-SmbShare -Name "PublicShare" -Path "C:\FileShare" -FullAccess "Everyone"
+          echo hello > C:\FileShare\hello.txt
           Write-Host "File Server setup complete."
-
           Stop-Transcript
 
-          #DNSServer
+          # DNSServer
           Start-Transcript -Path "C:\DNSServer.log" -Append
 
           Install-WindowsFeature DNS -IncludeManagementTools
@@ -116,6 +115,10 @@ Resources:
           New-NetFirewallRule -DisplayName "Allow DNS UDP 53" -Direction Inbound -Protocol UDP -LocalPort 53 -Action Allow
 
           Stop-Transcript
+          
+          # install firefox for testing proxy server
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install firefox -y
           </powershell>
 
   # end file server, dns server
@@ -126,6 +129,10 @@ Resources:
     Properties:
       GroupDescription: Enable RDP & Squid access & dhcp
       SecurityGroupIngress:
+        - IpProtocol: tcp # squid port
+          FromPort: 3128
+          ToPort: 3128
+          CidrIp: 0.0.0.0/0
         - IpProtocol: udp # dhcp port 67
           FromPort: 67
           ToPort: 67
@@ -1016,3 +1023,6 @@ Outputs:
   DomainControllerPublicDNS:
     Description: Domain Controller Public DNS
     Value: !GetAtt DomainControllerInstance.PublicDnsName
+  DomainControllerPrivateIP:
+    Description: Domain Controller Private IP
+    Value: !GetAtt DomainControllerInstance.PrivateIp
