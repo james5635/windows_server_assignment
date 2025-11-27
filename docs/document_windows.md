@@ -943,4 +943,187 @@ Use Amazon Elastic Container Service (ECS) or Amazon Elastic Kubernetes Service 
 - 88 (Kerberos)
 - 135 (RPC)
 - 139, 445 (SMB)
-- 389, 636 (LDAP,
+- 389, 636 (LDAP, LDAPS)
+- 3268, 3269 (Global Catalog)
+- 49152-65535 (Dynamic RPC)
+
+**Storage:** Minimum 50GB SSD  
+**Operating System:** Windows Server 2019/2022
+
+### Installation Steps
+
+1. **Prepare the Server**
+   - Set a static IP address in Windows network settings
+   - Configure DNS to point to itself (127.0.0.1) and a secondary DNS
+   - Rename the server with a descriptive hostname
+   - Ensure the system is fully updated
+
+2. **Install Active Directory Domain Services**
+   - Open Server Manager
+   - Click "Add roles and features"
+   - Select "Active Directory Domain Services" role
+   - Include management tools when prompted
+   - Complete the installation wizard
+
+3. **Promote to Domain Controller**
+   - Click the notification flag in Server Manager
+   - Select "Promote this server to a domain controller"
+   - Choose "Add a new forest" for a new domain or "Add a domain controller to an existing domain"
+   - Specify the root domain name (e.g., company.local)
+   - Set the Forest and Domain functional levels (Windows Server 2016 or higher recommended)
+   - Configure DNS and Global Catalog options (typically enabled by default)
+   - Set Directory Services Restore Mode (DSRM) password
+   - Review NetBIOS domain name
+   - Specify paths for AD database, log files, and SYSVOL
+   - Review settings and promote
+   - Server will restart automatically
+
+4. **Post-Installation Configuration**
+   - Verify DNS is functioning correctly
+   - Create Organizational Units (OUs) for logical organization
+   - Configure Group Policy Objects (GPOs) as needed
+   - Set up additional domain controllers for redundancy
+   - Configure Active Directory Sites and Services if multi-site
+   - Implement backup strategy for system state and Active Directory
+   - Configure time synchronization (PDC Emulator should sync with external source)
+   - Enable and configure Active Directory Recycle Bin for easier object recovery
+
+### Installation Steps - PowerShell
+
+1. **Set Static IP Address**
+```powershell
+# View current network adapters
+Get-NetAdapter
+
+# Set static IP (adjust values for your environment)
+New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.10 -PrefixLength 24 -DefaultGateway 10.0.1.1
+
+# Set DNS to localhost (127.0.0.1) and secondary
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1,8.8.8.8
+```
+
+2. **Rename Computer**
+```powershell
+# Rename the server
+Rename-Computer -NewName "DC01" -Restart
+```
+
+3. **Install AD DS Role**
+```powershell
+# Install Active Directory Domain Services role with management tools
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+# Verify installation
+Get-WindowsFeature | Where-Object {$_.Name -eq "AD-Domain-Services"}
+```
+
+4. **Promote to Domain Controller (New Forest)**
+```powershell
+# Import the AD DS Deployment module
+Import-Module ADDSDeployment
+
+# Create new forest and promote to DC
+Install-ADDSForest `
+    -DomainName "company.local" `
+    -DomainNetbiosName "COMPANY" `
+    -ForestMode "WinThreshold" `
+    -DomainMode "WinThreshold" `
+    -InstallDns:$true `
+    -CreateDnsDelegation:$false `
+    -DatabasePath "C:\Windows\NTDS" `
+    -LogPath "C:\Windows\NTDS" `
+    -SysvolPath "C:\Windows\SYSVOL" `
+    -NoRebootOnCompletion:$false `
+    -Force:$true
+```
+*Note: You'll be prompted for the SafeModeAdministratorPassword (DSRM password)*
+
+5. **Promote Additional Domain Controller (Existing Domain)**
+```powershell
+# Add DC to existing domain
+Install-ADDSDomainController `
+    -DomainName "company.local" `
+    -InstallDns:$true `
+    -Credential (Get-Credential "COMPANY\Administrator") `
+    -DatabasePath "C:\Windows\NTDS" `
+    -LogPath "C:\Windows\NTDS" `
+    -SysvolPath "C:\Windows\SYSVOL" `
+    -NoRebootOnCompletion:$false `
+    -Force:$true
+```
+
+6. **Post-Installation Verification**
+```powershell
+# Verify AD Web Services is running
+Get-Service ADWS
+
+# Check domain controller functionality
+Get-ADDomainController
+
+# Test AD replication (if multiple DCs)
+repadmin /replsummary
+
+# Verify DNS zones
+Get-DnsServerZone
+
+# Check SYSVOL replication
+dfsrdiag replicationstate /all
+
+# Verify FSMO roles
+Get-ADDomain | Select-Object InfrastructureMaster, RIDMaster, PDCEmulator
+Get-ADForest | Select-Object DomainNamingMaster, SchemaMaster
+```
+
+7. **Create Organizational Units**
+```powershell
+# Create OUs for organization
+New-ADOrganizationalUnit -Name "Users" -Path "DC=company,DC=local"
+New-ADOrganizationalUnit -Name "Computers" -Path "DC=company,DC=local"
+New-ADOrganizationalUnit -Name "Groups" -Path "DC=company,DC=local"
+New-ADOrganizationalUnit -Name "Servers" -Path "DC=company,DC=local"
+```
+
+8. **Configure Active Directory Recycle Bin**
+```powershell
+# Enable AD Recycle Bin (cannot be reversed)
+Enable-ADOptionalFeature -Identity 'Recycle Bin Feature' `
+    -Scope ForestOrConfigurationSet `
+    -Target 'company.local' `
+    -Confirm:$false
+```
+
+9. **Configure Time Synchronization (PDC Emulator)**
+```powershell
+# Configure external time source on PDC Emulator
+w32tm /config /manualpeerlist:"time.windows.com,0x8" /syncfromflags:manual /reliable:yes /update
+
+# Restart Windows Time service
+Restart-Service W32Time
+
+# Force sync and check status
+w32tm /resync
+w32tm /query /status
+```
+
+10. **Set Password Policy**
+```powershell
+# Configure default domain password policy
+Set-ADDefaultDomainPasswordPolicy -Identity "company.local" `
+    -ComplexityEnabled $true `
+    -LockoutDuration "00:30:00" `
+    -LockoutThreshold 5 `
+    -MaxPasswordAge "90.00:00:00" `
+    -MinPasswordAge "1.00:00:00" `
+    -MinPasswordLength 12 `
+    -PasswordHistoryCount 24
+```
+
+### Security Best Practices
+
+- Implement least privilege access for domain administrators
+- Use separate administrative accounts for daily tasks vs. domain administration
+- Enable and monitor security logs
+- Regularly patch and update the domain controller
+- Consider implementing tiered administrative model
+- Use strong password policies and account lockout policies
+- Utilize Advanced Threat Protection

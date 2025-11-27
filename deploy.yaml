@@ -936,3 +936,11 @@ Outputs:
   BackupServerPublicDNS:
     Description: Backup Server Public DNS
     Value: !GetAtt FTPServerBackupServerInstance.PublicDnsName
+
+  # docker #14
+  DockerPublicIP:
+    Description: Public IP of Docker
+    Value: !GetAtt DockerInstance.PublicIp
+  DockerPublicDNS:
+    Description: Docker Public DNS
+    Value: !GetAtt DockerInstance.PublicDnsName
