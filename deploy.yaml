@@ -6,7 +6,8 @@ Description: 15 Windows Server on AWS Cloud
 Parameters:
   InstanceType:
     Type: String
-    Default: t3.small
+    # Default: t3.small
+    Default: t3.medium
     AllowedValues:
       - t2.nano
       - t2.micro
@@ -796,8 +797,8 @@ Resources:
   # end ftp server, backup server
 
   
-  # begin docker, load balancing
-  
+  # begin docker, load balancing #14 #11
+  # manually configure load balancing
   DockerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
