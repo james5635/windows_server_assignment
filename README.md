@@ -61,11 +61,35 @@ LLMs - Large Language Model (Fine Tuner)
    - dhcp client will broadcast, and get ip, default gateway, dns,... from dhcp server
    - AWS VPC DHCP is used in EC2 instance
 5. VPN Server
-   - 
+   - TODO 🟧
+6. Terminal Server
+   - connect to the server with RDP
+7. Web Server
+   - visit public dns of the server
+8. Mail Server
+   - open thunderbird
+   - username: jame@example.local
+   - password: jame
+   - username: mike@example.local
+   - password: mike
+   - IMAP
+     - hostname: <public ip of mail server>
+     - port: 143
+   - SMTP
+     - hostname: <pubic ip of mail server>
+     - port: 25
+9. Database Server
+   - MongoDB
+     - mongosh <public ip of mongodb server>
+   - SQL Server
+     - /opt/mssql-tools18/bin/sqlcmd -S <public ip of sql server> -C -U sa -P mypassword@2025
+   - PostgreSQL
+     - psql -h <public ip of postgresql server> -U postgres
+     - password: test
 10. Backup Server
     - automatically backup "C:\inetpub" to s3 bucket every 1 minute and every night at 2 a.m.
     - check out the s3 bucket
-11. Load Balancing
+11. Load Balancing 📌
     - manually configure load balancer (application load balancer)
     - name: devspeedlb
     - select all availability Zones and subnets
