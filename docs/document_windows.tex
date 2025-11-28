@@ -1,0 +1,597 @@
+\documentclass[11pt, a4paper]{article}
+
+% --- UNIVERSAL PREAMBLE BLOCK ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{longtable}
+\usepackage{booktabs}
+
+\usepackage[english, provide=*]{babel}
+\babelprovide[import, onchar=ids fonts]{english}
+
+% Set default font to Noto Sans as per protocol
+\babelfont{rm}{Noto Sans}
+\babelfont{tt}{Noto Sans Mono}
+
+% Hyperlink Setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Windows Server Deployment Guide on AWS},
+    pdfauthor={AWS Documentation}
+}
+
+% Code Listing Configuration
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+\lstset{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{black!10},
+    columns=fullflexible
+}
+
+% Define generic style for PowerShell/Bash
+\lstdefinelanguage{PowerShell}{
+  keywords={Install-WindowsFeature, New-SmbShare, Enable-ComputerRestore, vssadmin, netsh, Add-DnsServerPrimaryZone, Add-DnsServerForwarder, Add-DhcpServerInDC, Add-DhcpServerv4Scope, Set-DhcpServerv4OptionValue, Install-RemoteAccess, New-RDSessionCollection, New-Website, New-WebAppPool, Setup.exe, New-WBPolicy, New-Cluster, New-WebFtpSite, docker, aws, Rename-Computer, New-NetIPAddress, Import-Module, Install-ADDSForest, Install-ADDSDomainController, Get-Service, New-ADOrganizationalUnit, Set-VpnServerConfiguration, New-RDRemoteApp, New-WebBinding, Set-ItemProperty, New-EC2Snapshot, Test-Cluster, Set-ClusterQuorum, Add-ClusterServerRole, Set-WebConfigurationProperty, New-SelfSignedCertificate, New-LocalUser, Get-Acl, Set-Acl, New-Object, Install-Module, Install-Package, Restart-Computer, Get-WindowsFeature, Get-NetAdapter, Set-DnsClientServerAddress, dfsrdiag, repadmin, w32tm, Restart-Service, Set-ADDefaultDomainPasswordPolicy, Enable-ADOptionalFeature},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={-Name, -IncludeManagementTools, -Path, -FullAccess, -ReadAccess, -Drive, -IPAddress, -ScopeId, -Router, -DnsServer, -VpnType, -CollectionName, -SessionHost, -Port, -PhysicalPath, -ApplicationPool, -Protocol, -SslFlags, -VolumePath, -Node, -StaticAddress, -NoStorage, -DomainName, -DatabasePath, -Identity, -Scope, -Target, -Confirm, -ComplexityEnabled, -LockoutDuration, -LockoutThreshold, -MaxPasswordAge, -MinPasswordAge, -MinPasswordLength, -PasswordHistoryCount},
+  ndkeywordstyle=\color{teal}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{\#},
+  morestring=[b]",
+  morestring=[b]'
+}
+
+\title{\textbf{Windows Server Deployment Guide on AWS Cloud}}
+% \author{System Administrator Guide}
+\author{Sou Chanrojame, Orn Pheakdey}
+% \date{\today}
+ 
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+	This document provides a comprehensive step-by-step guide for deploying various Windows Server roles and services on the AWS Cloud infrastructure, including configuration details for EC2 instances, security groups, and storage optimization.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Prerequisites}
+
+\subsection{AWS Account Setup}
+\begin{itemize}
+	\item Active AWS account with appropriate permissions
+	\item VPC configured with public and private subnets
+	\item Security groups properly configured
+	\item Key pairs created for RDP access
+	\item IAM roles for EC2 instances
+\end{itemize}
+
+\subsection{General Windows Server Launch Steps}
+\begin{enumerate}
+	\item Navigate to EC2 Dashboard in AWS Console
+	\item Click ``Launch Instance''
+	\item Select Windows Server AMI (2019/2022 recommended)
+	\item Choose instance type based on workload
+	\item Configure instance details (VPC, subnet, IAM role)
+	\item Add storage as needed
+	\item Configure security groups
+	\item Review and launch with key pair
+\end{enumerate}
+
+\newpage
+
+\section{File Server}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.medium or larger
+	\item[Storage:] EBS volumes with provisioned IOPS for performance
+	\item[Security Group Ports:] 445 (SMB), 139 (NetBIOS), 3389 (RDP)
+\end{description}
+
+\subsection{Implementation Steps}
+
+\subsubsection*{1. Launch Windows Server EC2 Instance}
+Select Windows Server 2022 Datacenter and attach additional EBS volumes for file storage.
+
+\subsubsection*{2. Install File Server Role}
+\begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name FS-FileServer -IncludeManagementTools
+Install-WindowsFeature -Name FS-DFS-Namespace, FS-DFS-Replication
+\end{lstlisting}
+
+\subsubsection*{3. Configure Storage}
+Initialize and format additional EBS volumes and create shared folders.
+\begin{lstlisting}[language=PowerShell]
+New-SmbShare -Name "SharedFiles" -Path "D:\Shares" -FullAccess "Domain\Admins" -ReadAccess "Domain\Users"
+\end{lstlisting}
+
+\subsubsection*{4. Enable Shadow Copies}
+\begin{lstlisting}[language=PowerShell]
+Enable-ComputerRestore -Drive "D:\"
+vssadmin resize shadowstorage /for=D: /on=D: /maxsize=20%
+\end{lstlisting}
+
+\subsubsection*{5. Configure AWS Backup}
+Create a backup plan for EBS volumes and set retention policies.
+
+\subsection{Best Practices}
+\begin{itemize}
+	\item Use AWS Storage Gateway for hybrid scenarios
+	\item Implement Amazon FSx for Windows File Server for a managed solution
+	\item Enable encryption at rest using AWS KMS
+	\item Configure NTFS permissions and share permissions
+\end{itemize}
+
+\section{Proxy Server (Caching, Control Access)}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.medium
+	\item[Security Group Ports:] 8080, 3128 (proxy), 3389 (RDP)
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Launch Windows Server Instance}
+	\item \textbf{Install Proxy Server Software}
+	      \begin{itemize}
+		      \item \textbf{Option A (WinGate):} Download/install WinGate and configure proxy settings.
+		      \item \textbf{Option B (Squid):} Download Squid for Windows and configure \texttt{squid.conf}.
+	      \end{itemize}
+	\item \textbf{Configure Proxy Settings}
+	      \begin{lstlisting}[language=PowerShell]
+# Example configuration for basic proxy
+netsh winhttp set proxy proxy-server="localhost:8080" bypass-list="*.local"
+\end{lstlisting}
+	\item \textbf{Set Up Caching:} Configure cache directory on separate EBS volume and set policies.
+	\item \textbf{Access Control:} Configure authentication (AD integration), URL filtering, and blacklists.
+	\item \textbf{Configure AWS Security Group:} Allow inbound traffic from specific CIDR blocks only.
+\end{enumerate}
+
+\section{DNS Server}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.small
+	\item[Security Group Ports:] 53 (TCP/UDP), 3389 (RDP)
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item Launch Windows Server Instance in a private subnet.
+	\item \textbf{Install DNS Server Role:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name DNS -IncludeManagementTools
+\end{lstlisting}
+	\item \textbf{Configure DNS Zones:}
+	      \begin{lstlisting}[language=PowerShell]
+# Create Primary Zone
+Add-DnsServerPrimaryZone -Name "yourdomain.local" -ReplicationScope "Forest" -PassThru
+
+# Create Reverse Lookup Zone
+Add-DnsServerPrimaryZone -NetworkID "10.0.0.0/16" -ReplicationScope "Forest"
+\end{lstlisting}
+	\item \textbf{Configure Forwarders:}
+	      \begin{lstlisting}[language=PowerShell]
+# Use AWS DNS or external DNS
+Add-DnsServerForwarder -IPAddress "8.8.8.8", "8.8.4.4"
+\end{lstlisting}
+	\item Integrate with AWS Route 53 Resolver endpoints if needed.
+\end{enumerate}
+
+\section{DHCP Server}
+\textit{Note: AWS VPC provides DHCP by default; a custom DHCP server is optional.}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.small
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Install DHCP Server Role:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name DHCP -IncludeManagementTools
+Add-DhcpServerInDC -DnsName "dhcp.yourdomain.local"
+\end{lstlisting}
+	\item \textbf{Configure DHCP Scope:}
+	      \begin{lstlisting}[language=PowerShell]
+Add-DhcpServerv4Scope -Name "Internal Network" -StartRange 10.0.1.100 -EndRange 10.0.1.200 -SubnetMask 255.255.255.0
+
+Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -Router 10.0.1.1
+Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -DnsServer 10.0.1.10
+\end{lstlisting}
+	\item \textbf{Configure Reservations:}
+	      \begin{lstlisting}[language=PowerShell]
+Add-DhcpServerv4Reservation -ScopeId 10.0.1.0 -IPAddress 10.0.1.50 -ClientId "00-11-22-33-44-55" -Description "Print Server"
+\end{lstlisting}
+	\item \textbf{Authorize DHCP Server:}
+	      \begin{lstlisting}[language=PowerShell]
+Add-DhcpServerInDC -DnsName "dhcp.yourdomain.local" -IPAddress 10.0.1.10
+\end{lstlisting}
+\end{enumerate}
+
+\section{VPN Server}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.small to t3.medium
+	\item[Security Group Ports:] 1723 (PPTP), 1701 (L2TP), 500/4500 (IPSec), 443 (SSTP)
+	\item[Elastic IP:] Required
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item Launch Windows Server Instance with Elastic IP.
+	\item \textbf{Install Remote Access Role:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name RemoteAccess -IncludeManagementTools
+Install-WindowsFeature -Name DirectAccess-VPN -IncludeManagementTools
+Install-WindowsFeature -Name Routing -IncludeManagementTools
+\end{lstlisting}
+	\item \textbf{Configure VPN Server:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-RemoteAccess -VpnType Vpn
+\end{lstlisting}
+	\item Enable SSTP, L2TP/IPSec, or IKEv2 and configure authentication.
+	\item \textbf{Set Up IP Address Assignment:}
+	      \begin{lstlisting}[language=PowerShell]
+Set-VpnServerConfiguration -TunnelType SSTP -PassThru
+\end{lstlisting}
+	\item Configure Routing (NAT and tables).
+\end{enumerate}
+
+\section{Terminal Server (Thin Clients)}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.xlarge or larger
+	\item[Security Group Ports:] 3389 (RDP), 3391 (RD Gateway)
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Install RDS Roles:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name RDS-RD-Server -IncludeManagementTools
+Install-WindowsFeature -Name RDS-Connection-Broker -IncludeManagementTools
+Install-WindowsFeature -Name RDS-Web-Access -IncludeManagementTools
+Install-WindowsFeature -Name RDS-Gateway -IncludeManagementTools
+Install-WindowsFeature -Name RDS-Licensing -IncludeManagementTools
+\end{lstlisting}
+	\item Configure RDS Deployment via Server Manager.
+	\item \textbf{Configure Session Collections:}
+	      \begin{lstlisting}[language=PowerShell]
+New-RDSessionCollection -CollectionName "Production" -SessionHost "rdsh01.yourdomain.local" -ConnectionBroker "rdcb.yourdomain.local"
+\end{lstlisting}
+	\item \textbf{Set Up RemoteApp:}
+	      \begin{lstlisting}[language=PowerShell]
+New-RDRemoteApp -CollectionName "Production" -DisplayName "Microsoft Word" -FilePath "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE"
+\end{lstlisting}
+\end{enumerate}
+
+\section{Web Server}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.medium
+	\item[Ports:] 80, 443, 3389
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Install IIS Role:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name Web-Server -IncludeManagementTools
+Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
+Install-WindowsFeature -Name Web-Mgmt-Console
+\end{lstlisting}
+	\item \textbf{Configure IIS:}
+	      \begin{lstlisting}[language=PowerShell]
+# Create new website
+New-Website -Name "MyWebsite" -Port 80 -PhysicalPath "C:\inetpub\MyWebsite" -ApplicationPool "DefaultAppPool"
+
+# Create application pool
+New-WebAppPool -Name "MyAppPool"
+Set-ItemProperty IIS:\AppPools\MyAppPool -name "managedRuntimeVersion" -value "v4.0"
+\end{lstlisting}
+	\item \textbf{Install SSL Certificate:}
+	      \begin{lstlisting}[language=PowerShell]
+New-WebBinding -Name "MyWebsite" -Protocol "https" -Port 443 -SslFlags 0
+\end{lstlisting}
+\end{enumerate}
+
+\section{Mail Server}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.medium
+	\item[Ports:] 25 (SMTP), 110, 143, 587, 993, 995
+	\item[Elastic IP:] Required
+\end{description}
+
+\begin{itemize}
+	\item \textbf{Crucial:} AWS blocks port 25 by default. You must request removal via AWS Support.
+	\item \textbf{Software Options:} hMailServer (Free) or Microsoft Exchange Server.
+	\item \textbf{Alternative:} Use Amazon SES for better deliverability.
+\end{itemize}
+
+\section{Database Server}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] r5.large or larger (Memory Optimized)
+	\item[Storage:] Provisioned IOPS or io2
+\end{description}
+
+\subsection{Implementation Steps}
+
+\subsubsection*{SQL Server}
+\begin{lstlisting}[language=PowerShell]
+# Silent installation example
+Setup.exe /Q /ACTION=Install /FEATURES=SQLEngine /INSTANCENAME=MSSQLSERVER /SQLSYSADMINACCOUNTS="DOMAIN\SQLAdmins" /AGTSVCACCOUNT="NT AUTHORITY\SYSTEM" /SQLSVCACCOUNT="NT AUTHORITY\SYSTEM"
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL]
+-- Enable remote connections
+EXEC sys.sp_configure 'remote access', 1;
+RECONFIGURE;
+
+-- Configure max memory
+EXEC sys.sp_configure 'max server memory (MB)', 8192;
+RECONFIGURE;
+
+-- Backup to S3
+BACKUP DATABASE [MyDB] TO URL = 's3://my-bucket/backups/MyDB.bak'
+\end{lstlisting}
+
+\subsubsection*{PostgreSQL}
+Edit \texttt{postgresql.conf} and \texttt{pg\_hba.conf}:
+\begin{lstlisting}[language=Bash]
+# postgresql.conf
+listen_addresses = '*'
+max_connections = 100
+shared_buffers = 2GB
+
+# pg_hba.conf
+host all all 0.0.0.0/0 md5
+\end{lstlisting}
+
+\subsubsection*{MongoDB}
+\begin{lstlisting}[language=Bash]
+# mongod.cfg
+net:
+  port: 27017
+  bindIp: 0.0.0.0
+security:
+  authorization: enabled
+storage:
+  dbPath: D:\MongoDB\data
+\end{lstlisting}
+
+\section{Backup Server}
+
+\subsection{AWS Configuration}
+\begin{itemize}
+	\item \textbf{Instance:} t3.medium
+	\item \textbf{Role:} IAM permissions for S3 and EBS snapshots.
+\end{itemize}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Install Windows Server Backup:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name Windows-Server-Backup -IncludeManagementTools
+\end{lstlisting}
+	\item \textbf{Configure Backup to S3 (Example):}
+	      \begin{lstlisting}[language=PowerShell]
+$Policy = New-WBPolicy
+$Target = New-WBBackupTarget -VolumePath "D:"
+Add-WBBackupTarget -Policy $Policy -Target $Target
+Add-WBVolume -Policy $Policy -Volume (Get-WBVolume -VolumePath "C:")
+Set-WBSchedule -Policy $Policy -Schedule 02:00
+Set-WBPolicy -Policy $Policy
+\end{lstlisting}
+	\item Use AWS Backup for centralized management and S3 Glacier for archiving.
+\end{enumerate}
+
+\section{Load Balancing}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item Launch multiple identical servers in different availability zones.
+	\item \textbf{Create Target Group:} Protocol HTTP/HTTPS, Health Check Path \texttt{/health}.
+	\item \textbf{Create Application Load Balancer (ALB):} Add listener rules and register target group.
+	\item \textbf{Session Persistence:} Enable sticky sessions if required.
+\end{enumerate}
+
+\section{Failover Cluster}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] r5.xlarge or larger
+	\item[Storage:] Shared storage via FSx for Windows or EBS Multi-Attach (io2).
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Install Failover Clustering:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools
+\end{lstlisting}
+	\item \textbf{Create Failover Cluster:}
+	      \begin{lstlisting}[language=PowerShell]
+# Validate
+Test-Cluster -Node "Node1", "Node2"
+
+# Create
+New-Cluster -Name "MyCluster" -Node "Node1", "Node2" -StaticAddress "10.0.1.100" -NoStorage
+\end{lstlisting}
+	\item \textbf{Configure Quorum:}
+	      \begin{lstlisting}[language=PowerShell]
+Set-ClusterQuorum -NodeAndFileShareMajority "\\FSx\Witness"
+\end{lstlisting}
+	\item \textbf{Add Clustered Role (e.g., SQL):}
+	      \begin{lstlisting}[language=PowerShell]
+Add-ClusterServerRole -Name "SQL-Cluster" -Storage "Cluster Disk 1"
+\end{lstlisting}
+\end{enumerate}
+
+\section{FTP Server}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Ports:] 21, 20, 990, Passive Range (50000-50100)
+	\item[Elastic IP:] Required
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Install Role:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name Web-Ftp-Server -IncludeManagementTools
+Install-WindowsFeature -Name Web-Ftp-Service
+\end{lstlisting}
+	\item \textbf{Configure Site \& Passive Mode:}
+	      \begin{lstlisting}[language=PowerShell]
+New-WebFtpSite -Name "FTP Site" -Port 21 -PhysicalPath "D:\FTP"
+
+# Passive Ports
+Set-WebConfigurationProperty -Filter /system.ftpServer/firewallSupport -PSPath IIS:\ -Name lowDataChannelPort -Value 50000
+Set-WebConfigurationProperty -Filter /system.ftpServer/firewallSupport -PSPath IIS:\ -Name highDataChannelPort -Value 50100
+\end{lstlisting}
+	\item \textbf{Enable FTPS (SSL):}
+	      \begin{lstlisting}[language=PowerShell]
+$cert = New-SelfSignedCertificate -DnsName "ftp.yourdomain.com" -CertStoreLocation cert:\LocalMachine\My
+Set-WebConfigurationProperty -Filter /system.ftpServer/security/ssl -PSPath IIS:\ -Location "FTP Site" -Name serverCertHash -Value $cert.Thumbprint
+Set-WebConfigurationProperty -Filter /system.ftpServer/security/ssl -PSPath IIS:\ -Location "FTP Site" -Name ssl128 -Value $true
+\end{lstlisting}
+\end{enumerate}
+
+\section{Container (Docker)}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[OS:] Windows Server 2019/2022 with Containers
+\end{description}
+
+\subsection{Implementation Steps}
+\begin{enumerate}
+	\item \textbf{Install Docker:}
+	      \begin{lstlisting}[language=PowerShell]
+Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
+Install-Package -Name docker -ProviderName DockerMsftProvider -Force
+Restart-Computer -Force
+\end{lstlisting}
+	\item \textbf{Create Dockerfile:}
+	      \begin{lstlisting}[language=Bash]
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8
+WORKDIR /inetpub/wwwroot
+COPY ./app .
+EXPOSE 80
+\end{lstlisting}
+	\item \textbf{Build and Run:}
+	      \begin{lstlisting}[language=PowerShell]
+docker build -t mywebapp:v1 .
+docker run -d -p 80:80 --name webapp mywebapp:v1
+\end{lstlisting}
+	\item \textbf{Push to ECR:}
+	      \begin{lstlisting}[language=PowerShell]
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+docker push ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/mywebapp:v1
+\end{lstlisting}
+\end{enumerate}
+
+\section{Domain Controller}
+
+\subsection{AWS Configuration}
+\begin{description}
+	\item[Instance Type:] t3.medium or larger
+	\item[Ports:] 53, 88, 135, 139, 445, 389, 636, 3268, 3269, 49152-65535
+	\item[Storage:] Minimum 50GB SSD
+\end{description}
+
+\subsection{Implementation Steps}
+
+\subsubsection*{1. Initial Configuration}
+Set static IP and rename the computer.
+\begin{lstlisting}[language=PowerShell]
+New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.10 -PrefixLength 24 -DefaultGateway 10.0.1.1
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1,8.8.8.8
+Rename-Computer -NewName "DC01" -Restart
+\end{lstlisting}
+
+\subsubsection*{2. Install AD DS and Promote to DC}
+\begin{lstlisting}[language=PowerShell]
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+Import-Module ADDSDeployment
+
+Install-ADDSForest `
+    -DomainName "company.local" `
+    -DomainNetbiosName "COMPANY" `
+    -ForestMode "WinThreshold" `
+    -DomainMode "WinThreshold" `
+    -InstallDns:$true `
+    -Force:$true
+\end{lstlisting}
+
+\subsubsection*{3. Post-Installation Config}
+\begin{lstlisting}[language=PowerShell]
+# Check status
+Get-Service ADWS
+Get-ADDomainController
+
+# Create OUs
+New-ADOrganizationalUnit -Name "Users" -Path "DC=company,DC=local"
+New-ADOrganizationalUnit -Name "Computers" -Path "DC=company,DC=local"
+
+# Enable Recycle Bin
+Enable-ADOptionalFeature -Identity 'Recycle Bin Feature' -Scope ForestOrConfigurationSet -Target 'company.local' -Confirm:$false
+\end{lstlisting}
+
+\subsubsection*{4. Time Sync (PDC Emulator)}
+\begin{lstlisting}[language=PowerShell]
+w32tm /config /manualpeerlist:"time.windows.com,0x8" /syncfromflags:manual /reliable:yes /update
+Restart-Service W32Time
+\end{lstlisting}
+
+\subsection{Security Best Practices}
+\begin{itemize}
+	\item Implement least privilege access.
+	\item Use separate administrative accounts.
+	\item Enable and monitor security logs.
+	\item Regularly patch and update.
+	\item Use strong password policies.
+\end{itemize}
+
+\end{document}

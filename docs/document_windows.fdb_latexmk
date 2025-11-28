@@ -1,0 +1,24 @@
+# Fdb version 4
+["pdflatex"] 1764345058.66752 "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" "document_windows.pdf" "document_windows" 1764345058.84846 2
+  "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" 1764345058.40775 21519 2b588c798f9086c7aa1f82cacdb3465f ""
+  "/home/jame/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmr10.tfm" 1136768653 1296 45809c5a464d5f32c8f98ba97c1bb47f ""
+  "/home/jame/texlive/2025/texmf-dist/tex/generic/iftex/iftex.sty" 1734129479 7984 7dbb9280f03c0a315425f1b4f35d43ee ""
+  "/home/jame/texlive/2025/texmf-dist/tex/generic/iftex/ifvtex.sty" 1572645307 1057 525c2192b5febbd8c1f662c9468335bb ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/base/article.cls" 1748806692 20144 b966087dda3b194755eb460d32e2ef75 ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/base/size11.clo" 1748806692 8464 f339f4d5391fbe0425b2d94c90e6819e ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/fontspec/fontspec.sty" 1715459803 3755 4872b99d810c024f9c09bb1c62ffee3b ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/geometry/geometry.sty" 1578002852 41601 9cf6c5257b1bc7af01a58859749dd37a ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/graphics/keyval.sty" 1748806692 2671 d9941f4bf4750e9b0603c9a2ec54693b ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def" 1751059413 30351 a2b09edc6c93a742566b222c33d0278e ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/l3kernel/expl3.sty" 1753040605 6558 6a7bdf2b9dc12321254cf7c89df8b797 ""
+  "/home/jame/texlive/2025/texmf-dist/tex/latex/l3packages/xparse/xparse.sty" 1724879202 9783 ab4bee47700c04aadedb8da27591b0ab ""
+  "/home/jame/texlive/2025/texmf-dist/web2c/texmf.cnf" 1749313668 42213 4e2ca030e8e2640502016e9e45868dcb ""
+  "/home/jame/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1753977178 2935149 e4002a7f8fade75c6309e5ddeec1fc2d ""
+  "/home/jame/texlive/2025/texmf.cnf" 1753977162.24481 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
+  "document_windows.aux" 1764345050.90423 6130 8153dca5083fefb8eeaf56d70c03e734 "pdflatex"
+  "document_windows.tex" 1764345058.40775 21519 2b588c798f9086c7aa1f82cacdb3465f ""
+  (generated)
+  "document_windows.aux"
+  "document_windows.log"
+  "document_windows.pdf"
+  (rewritten before read)
