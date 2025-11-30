@@ -349,6 +349,8 @@ Resources:
 
           Stop-Transcript
 
+          choco install openvpn -y  --package-parameters=" /AddToDesktop /Gui /GuiOnLogon /EasyRsa /DcoDriver /TapDriver /WintunDriver /OpenSSL /Service "
+
           </powershell>
 
   # end terminal server, vpn server
