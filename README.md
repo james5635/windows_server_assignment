@@ -38,16 +38,19 @@ LLMs - Large Language Model  (Fine Tuner)
 14. Container (Docker) ✅
 15. Domain Controller ✅
 
-LLMs - Large Language Model (Fine Tuner)
+LLMs - Large Language Model (Fine Tuner) ✅
+
+[Try Hack Me](https://tryhackme.com/)
 
 # Usage
+
 1. File Server
    - connect to Proxy Server
    - open file explorer and `\\<public ip of File Server>`
    - enter credential
 2. Proxy Server
    - connect to File Server
-   - change proxy address to `<private ip of Proxy Server>` with port 3128 
+   - change proxy address to `<private ip of Proxy Server>` with port 3128
    - open browser
    - visit youtube.com => allow
    - visit facebook.com => blocked
@@ -96,7 +99,7 @@ LLMs - Large Language Model (Fine Tuner)
     - create target group (name: web)
       - include WebServerMailServer & Docker
     - choose 'web' as target group
-    - add tcp (port 80) to inbound rule of the load balancer's security group 
+    - add tcp (port 80) to inbound rule of the load balancer's security group
 12. Failover Cluster
     - TODO 🟧
 13. FTP Server
