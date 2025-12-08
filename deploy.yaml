@@ -413,6 +413,7 @@ Resources:
           New-NetFirewallRule -DisplayName "OpenVPN" -Direction Inbound -Protocol UDP -LocalPort 1194 -Action Allow
           New-NetFirewallRule -DisplayName "ShareFileOpenVPN" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
           
+          Start-Process "C:\Program Files\OpenVPN\bin\openvpn-gui.exe"
           
           # # for client to openvpn server
           # $cfg = "C:\Program Files\OpenVPN\config"
@@ -1035,9 +1036,17 @@ Outputs:
   TerminalServerPublicIP:
     Description: Public IP of Terminal Server
     Value: !GetAtt TerminalServerVPNServerInstance.PublicIp
+  TerminalServerPublicDNS:
+    Description: Public DNS of Terminal Server
+    Value: !GetAtt TerminalServerVPNServerInstance.PublicDnsName
   RDPConnection:
     Description: Use this to connect via Remote Desktop
     Value: !Sub "RDP to: ${TerminalServerVPNServerInstance.PublicDnsName}"
+
+  # vpn server #5
+  VPNServerPublicIP:
+    Description: Public IP of VPN Server
+    Value: !GetAtt TerminalServerVPNServerInstance.PublicIp
 
   # database server #9
   PostgreSQLPublicIP:

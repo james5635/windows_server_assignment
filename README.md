@@ -64,7 +64,19 @@ LLMs - Large Language Model (Fine Tuner) ✅
    - dhcp client will broadcast, and get ip, default gateway, dns,... from dhcp server
    - AWS VPC DHCP is used in EC2 instance
 5. VPN Server
-   - TODO 🟧
+   - connect to File Server
+   - change YOUR_PUBLIC_IP in `C:\Program Files\OpenVPN\config\client1.ovpn` to public ip of the VPN Server
+   - Open `OpenVPN GUI`
+   - Open powershell and type `ipconfig` and will see something like:
+   ```
+   Unknown adapter OpenVPN Data Channel Offload:
+   
+      Connection-specific DNS Suffix  . :
+      Link-local IPv6 Address . . . . . : fe80::f729:5f67:58f2:7253%17
+      IPv4 Address. . . . . . . . . . . : 10.8.0.6
+      Subnet Mask . . . . . . . . . . . : 255.255.255.252
+      Default Gateway . . . . . . . . . :
+   ```
 6. Terminal Server
    - connect to the server with RDP
 7. Web Server
