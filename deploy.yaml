@@ -119,6 +119,16 @@ Resources:
           # install firefox for testing proxy server
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install firefox -y
+          
+           
+          # for client to openvpn server
+          choco install openvpn -y  --package-parameters=" /AddToDesktop /Gui /GuiOnLogon /EasyRsa /DcoDriver /TapDriver /WintunDriver /OpenSSL /Service "
+          $cfg = "C:\Program Files\OpenVPN\config"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/client/client1.ovpn -OutFile "$cfg\client1.ovpn"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/ca.crt -OutFile "$cfg\ca.crt"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/client/client1.crt -OutFile "$cfg\client1.crt"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/client/client1.key -OutFile "$cfg\client1.key"
+          
           </powershell>
 
   # end file server, dns server
@@ -391,11 +401,11 @@ Resources:
           
           $cfg = "C:\Program Files\OpenVPN\config"
           
-          Invoke-WebRequest <url> "$cfg\dh.pem"
-          Invoke-WebRequest <url> "$cfg\server.crt"
-          Invoke-WebRequest <url> "$cfg\server.key"
-          Invoke-WebRequest <url> "$cfg\ca.crt"
-          Invoke-WebRequest <url> "$cfg\server.ovpn"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/dh.pem -OutFile "$cfg\dh.pem"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/server.crt -OutFile "$cfg\server.crt"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/server.key -OutFile "$cfg\server.key"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/ca.crt -OutFile "$cfg\ca.crt"
+          Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/server.ovpn -OutFile "$cfg\server.ovpn"
           
           Set-Service -Name OpenVPNService -StartupType Automatic
           Start-Service -Name OpenVPNService
