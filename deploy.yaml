@@ -413,6 +413,7 @@ Resources:
           New-NetFirewallRule -DisplayName "OpenVPN" -Direction Inbound -Protocol UDP -LocalPort 1194 -Action Allow
           New-NetFirewallRule -DisplayName "ShareFileOpenVPN" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
           
+          sleep -Seconds 2
           Start-Process "C:\Program Files\OpenVPN\bin\openvpn-gui.exe"
           
           # # for client to openvpn server
