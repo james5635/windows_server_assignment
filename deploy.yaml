@@ -404,12 +404,12 @@ Resources:
           New-NetFirewallRule -DisplayName "ShareFileOpenVPN" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
           
           
-          # for client to openvpn server
-          $cfg = "C:\Program Files\OpenVPN\config"
-          Invoke-WebRequest <url> "$cfg\client1.ovpn"
-          Invoke-WebRequest <url> "$cfg\ca.crt"
-          Invoke-WebRequest <url> "$cfg\client1.crt"
-          Invoke-WebRequest <url> "$cfg\client1.key"
+          # # for client to openvpn server
+          # $cfg = "C:\Program Files\OpenVPN\config"
+          # Invoke-WebRequest <url> "$cfg\client1.ovpn"
+          # Invoke-WebRequest <url> "$cfg\ca.crt"
+          # Invoke-WebRequest <url> "$cfg\client1.crt"
+          # Invoke-WebRequest <url> "$cfg\client1.key"
           
           Stop-Transcript
 
