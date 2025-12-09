@@ -40,9 +40,7 @@ LLMs - Large Language Model  (Fine Tuner)
 
 LLMs - Large Language Model (Fine Tuner) ✅
 
-[Try Hack Me](https://tryhackme.com/)
-
-Slide
+[Try Hack Me](https://tryhackme.com/) (1000 points)
 
 # Usage
 
@@ -134,3 +132,9 @@ Slide
     - connect to File Server
     - change dns server address to `<private ip of domain controller>`
     - join the domain 'example.local'
+
+LLMs - Large Language Model (Fine Tuner)
+
+- open `Fine Tuning LLM` notebook
+- go to `Inference` section
+- run the vllm and open-webui server
