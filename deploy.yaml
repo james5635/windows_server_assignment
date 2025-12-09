@@ -989,6 +989,76 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           <powershell>
+          # failover cluster
+          # this ec2 instance work as a server enabling failover cluster
+          # other windows server can join this domain and setup the cluster
+          # setting up the failover cluster on other windows server is like below:
+          # ******************************************************************
+          # 
+          # # ================================
+          # # Failover Cluster Setup Script
+          # # Windows Server (PowerShell)
+          # # ================================
+          #
+          # # ---- CONFIGURATION ----
+          # $ClusterName = "MyCluster"
+          # $ClusterNodes = @("Node1", "Node2")      # Add more nodes if needed
+          # $ClusterIP = "192.168.1.50"              # Cluster IP Address
+          # $ClusterNetmask = "255.255.255.0"
+          # $ClusterStaticAddress = @("$ClusterIP/$ClusterNetmask")
+          #
+          # # ---- 1. Install Failover-Clustering Feature ----
+          # Write-Host "Installing Failover Clustering feature..." -ForegroundColor Cyan
+          # Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -Verbose
+          #
+          # # ---- 2. Install File Server role (Optional but common) ----
+          # Write-Host "Installing File Server role..." -ForegroundColor Cyan
+          # Install-WindowsFeature FS-Fileserver -Verbose
+          #
+          # # ---- 3. Validate the cluster nodes ----
+          # Write-Host "Validating cluster configuration..." -ForegroundColor Cyan
+          # Test-Cluster -Node $ClusterNodes -Verbose -Ignore "Storage" | Out-File C:\ClusterValidationReport.txt
+          #
+          # Write-Host "Validation complete. Report saved to C:\ClusterValidationReport.txt" -ForegroundColor Green
+          #
+          # # ---- 4. Create the cluster ----
+          # Write-Host "Creating cluster..." -ForegroundColor Cyan
+          # New-Cluster `
+          #     -Name $ClusterName `
+          #     -Node $ClusterNodes `
+          #     -StaticAddress $ClusterIP `
+          #     -NoStorage `
+          #     -Verbose
+          #
+          # # ---- 5. Configure cluster network settings ----
+          # Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
+          # Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1 -Verbose
+          #
+          # # ---- 6. Enable CSV (Cluster Shared Volumes) ----
+          # Write-Host "Checking for available disks..." -ForegroundColor Cyan
+          # $AvailableDisks = Get-ClusterAvailableDisk
+          #
+          # if ($AvailableDisks) {
+          #     Write-Host "Adding disks to Cluster Shared Volumes..." -ForegroundColor Cyan
+          #     Add-ClusterSharedVolume -InputObject $AvailableDisks -Verbose
+          # } else {
+          #     Write-Host "No available disks found. Skipping CSV configuration." -ForegroundColor Yellow
+          # }
+          #
+          # # ---- 7. (Optional) Configure Quorum ----
+          # Write-Host "Configuring quorum (Node Majority)..." -ForegroundColor Cyan
+          # Set-ClusterQuorum -Cluster $ClusterName -NodeMajority
+          #
+          # # ---- DONE ----
+          # Write-Host "`n====================================="
+          # Write-Host "  Failover Cluster Creation Complete!"
+          # Write-Host "  Cluster Name: $ClusterName"
+          # Write-Host "  Nodes: $($ClusterNodes -join ', ')"
+          # Write-Host "  IP: $ClusterIP"
+          # Write-Host "=====================================" -ForegroundColor Green
+          # 
+          # ******************************************************************
+
           
           # domain controller
           Start-Transcript -Path "C:\DomainController.log" -Append
