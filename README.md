@@ -26,7 +26,7 @@ LLMs - Large Language Model  (Fine Tuner)
 2. Proxy Server (Caching, Control Access) ✅
 3. DNS Server ✅
 4. DHCP Server ✅
-5. VPN Server :todo
+5. VPN Server ✅
 6. Terminal Server (Thin Clients) ✅
 7. Web Server ✅
 8. Mail Server ✅
@@ -41,6 +41,8 @@ LLMs - Large Language Model  (Fine Tuner)
 LLMs - Large Language Model (Fine Tuner) ✅
 
 [Try Hack Me](https://tryhackme.com/)
+
+Slide
 
 # Usage
 
@@ -64,19 +66,23 @@ LLMs - Large Language Model (Fine Tuner) ✅
    - dhcp client will broadcast, and get ip, default gateway, dns,... from dhcp server
    - AWS VPC DHCP is used in EC2 instance
 5. VPN Server
+   - connect to VPN Server
+   - Open `OpenVPN GUI` to start the server
    - connect to File Server
    - change YOUR_PUBLIC_IP in `C:\Program Files\OpenVPN\config\client1.ovpn` to public ip of the VPN Server
-   - Open `OpenVPN GUI`
+   - Open `OpenVPN GUI` to connect to the server
    - Open powershell and type `ipconfig` and will see something like:
+
    ```
    Unknown adapter OpenVPN Data Channel Offload:
-   
+
       Connection-specific DNS Suffix  . :
       Link-local IPv6 Address . . . . . : fe80::f729:5f67:58f2:7253%17
       IPv4 Address. . . . . . . . . . . : 10.8.0.6
       Subnet Mask . . . . . . . . . . . : 255.255.255.252
       Default Gateway . . . . . . . . . :
    ```
+
 6. Terminal Server
    - connect to the server with RDP
 7. Web Server
