@@ -133,8 +133,15 @@ LLMs - Large Language Model (Fine Tuner) ✅
     - change dns server address to `<private ip of domain controller>`
     - join the domain 'example.local'
 
-LLMs - Large Language Model (Fine Tuner)
+LLMs - Large Language Model (Fine Tuner) 📌
 
 - open `Fine Tuning LLM` notebook
 - go to `Inference` section
 - run the vllm and open-webui server
+- ask `"tell me about RUPP"`
+- ask `"when RUPP is established?"`
+
+Try Hack Me
+
+- go to folder `tryhackme`
+- open the two images
