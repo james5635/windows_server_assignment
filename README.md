@@ -40,7 +40,7 @@ LLMs - Large Language Model  (Fine Tuner)
 
 LLMs - Large Language Model (Fine Tuner) ✅
 
-[Try Hack Me](https://tryhackme.com/) (20083 points)
+[Try Hack Me](https://tryhackme.com/) (20083 points) ✅
 
 # Usage
 
