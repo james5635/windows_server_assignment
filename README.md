@@ -46,7 +46,7 @@ LLMs - Large Language Model (Fine Tuner) ✅
 
 1. File Server
    - connect to Proxy Server
-   - open file explorer and `\\<public ip of File Server>`
+   - open file explorer and `\\<public dns of File Server>`
    - enter credential
 2. Proxy Server
    - connect to File Server
