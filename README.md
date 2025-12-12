@@ -139,7 +139,8 @@ LLMs - Large Language Model (Fine Tuner) 📌
 - go to `Inference` section
 - run the vllm and open-webui server
 - ask `"tell me about RUPP"`
-- ask `"when RUPP is established?"`
+- ask `"list academic staffs of computer science department at RUPP with name"`
+- ask `"teach me flutter and give example"`
 
 Try Hack Me
 
