@@ -63,6 +63,13 @@ LLMs - Large Language Model (Fine Tuner) ✅
 4. DHCP Server
    - dhcp client will broadcast, and get ip, default gateway, dns,... from dhcp server
    - AWS VPC DHCP is used in EC2 instance
+   ``` 
+   Is the dhcp server in ec2 instance works in AWS, becuase ec2 instance already used VPC DHCP?
+   No — a normal DHCP server inside an EC2 instance does NOT work for assigning IPs to other EC2 instances.
+   Because:
+   👉 AWS VPC already provides DHCP
+   👉 DHCP broadcast is blocked in AWS
+   ```
 5. VPN Server
    - connect to VPN Server
    - Open `OpenVPN GUI` to start the server

@@ -236,6 +236,17 @@ Resources:
           # | **Bridged**      | ❌ (uses real LAN DHCP) | ✅        | ✅                   |
           # | **Custom VMnet** | Depends                 | Depends   | Depends              |
 
+          # Why your Windows DHCP server doesn’t work in VMware?
+          # If your VM is using:
+          # NAT or Host-Only
+          # Then:
+          # ➡️ Client gets IP from VMware DHCP
+          # ➡️ Your Windows DHCP never gets the request
+          # 
+          # How to use YOUR Windows DHCP in VMware
+          # Option 1: Bridged Network (Easiest)
+          # Option 2: Custom VMnet (Recommended for Lab)
+
           # Install DHCP Role
           Install-WindowsFeature DHCP -IncludeManagementTools
 
