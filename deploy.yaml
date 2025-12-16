@@ -193,7 +193,25 @@ Resources:
 
           # dhcp client will broadcast, and get ip, default gateway, dns,... from dhcp server
           # AWS VPC DHCP is used in EC2 instance
-
+        
+          # Is the dhcp server in ec2 instance works in AWS, becuase ec2 instance already used VPC DHCP?
+          # No — a normal DHCP server inside an EC2 instance does NOT work for assigning IPs to other EC2 instances.
+          # Because:
+          # 👉 AWS VPC already provides DHCP
+          # 👉 DHCP broadcast is blocked in AWS
+ 
+          # You cannot run your own traditional DHCP server within an AWS VPC to manage IP addresses 
+          # for other AWS instances in the same VPC, because the broadcast messages required for a client 
+          # to discover and request an IP address (DHCPDISCOVER and DHCPREQUEST) are blocked by the AWS network's design. 
+            
+          # Every VPC you create automatically uses a default DHCP option set provided by Amazon. 
+          # This service is mandatory and cannot be disabled; all instances in the VPC receive 
+          # their network configurations (IP address, DNS server, etc.) from it.
+          # Once an instance is running, the AWS DHCP service primarily uses unicast communication 
+          # to renew leases or offer specific configuration parameters. The underlying network fabric handles 
+          # the initial configuration process without relying on traditional Layer 2 broadcasts 
+          # across the entire subnet that you might see in an on-premises network. 
+        
           # | Direction           | Port       | Purpose                       |
           # | ------------------- | ---------- | ----------------------------- |
           # | **Client → Server** | **UDP 67** | Client sends Discover/Request |
@@ -206,6 +224,17 @@ Resources:
           # UDP 67 = DHCP Server Port
           # UDP 68 = DHCP Client Port
           # DHCP is entirely broadcast-based within a subnet.
+          
+          # DHCP server will work in Vmware.
+           
+          # VMware Network Types
+          # 
+          # | Network Type     | DHCP                    | Internet  | Same Network?        |
+          # | ---------------- | ----------------------- | --------- | -------------------- |
+          # | **NAT**          | ✅ VMware DHCP          | ✅        | ❌ (VMware internal) |
+          # | **Host-Only**    | ✅ VMware DHCP          | ❌        | ❌                   |
+          # | **Bridged**      | ❌ (uses real LAN DHCP) | ✅        | ✅                   |
+          # | **Custom VMnet** | Depends                 | Depends   | Depends              |
 
           # Install DHCP Role
           Install-WindowsFeature DHCP -IncludeManagementTools
