@@ -229,23 +229,19 @@ Resources:
            
           # VMware Network Types
           # 
-          # | Network Type     | DHCP                    | Internet  | Same Network?        |
+          # | Network Type     | DHCP Available?         | Internet  | Same Network?        |
           # | ---------------- | ----------------------- | --------- | -------------------- |
           # | **NAT**          | ✅ VMware DHCP          | ✅        | ❌ (VMware internal) |
           # | **Host-Only**    | ✅ VMware DHCP          | ❌        | ❌                   |
           # | **Bridged**      | ❌ (uses real LAN DHCP) | ✅        | ✅                   |
           # | **Custom VMnet** | Depends                 | Depends   | Depends              |
 
-          # Why your Windows DHCP server doesn’t work in VMware?
-          # If your VM is using:
-          # NAT or Host-Only
-          # Then:
-          # ➡️ Client gets IP from VMware DHCP
-          # ➡️ Your Windows DHCP never gets the request
-          # 
           # How to use YOUR Windows DHCP in VMware
-          # Option 1: Bridged Network (Easiest)
-          # Option 2: Custom VMnet (Recommended for Lab)
+          # Option 1: Host-Only/NAT Network with disable use local DHCP service
+          # Option 2: Bridged network may work, but possibily it get the DHCP from router instead of the Windows VM
+          # Option 3: Custom VMnet
+          
+          # How to Install and Configure DHCP Server in Windows Server 2016/2019 => https://youtu.be/wkdNmVq_ByU?si=j7S_crnChwZzds7- 
 
           # Install DHCP Role
           Install-WindowsFeature DHCP -IncludeManagementTools
@@ -1032,36 +1028,40 @@ Resources:
           # failover cluster
           # this ec2 instance work as a server enabling failover cluster
           # other windows server can join this domain and setup the cluster
+          # 
+          # Create Windows Server 2022 Failover Cluster using PowerShell => https://youtu.be/NHUUw2JUAec?si=jl-pPh--89VO94A1
+          # 
           # setting up the failover cluster on other windows server is like below:
           # ******************************************************************
           # 
           # # ================================
-          # # Failover Cluster Setup Script
-          # # Windows Server (PowerShell)
+          # # Script 1: Run on EVERY NODE
+          # # ================================
+          #
+          # Write-Host "Installing Failover Clustering feature..." -ForegroundColor Cyan
+          # Install-WindowsFeature Failover-Clustering -IncludeManagementTools -Restart
+          #
+          # Write-Host "Installing File Server role (optional)..." -ForegroundColor Cyan
+          # Install-WindowsFeature FS-Fileserver
+          #
+          # ******************************************************************
+          #
+          # # ================================
+          # # Script 2: Run on ONE NODE ONLY
           # # ================================
           #
           # # ---- CONFIGURATION ----
-          # $ClusterName = "MyCluster"
-          # $ClusterNodes = @("Node1", "Node2")      # Add more nodes if needed
-          # $ClusterIP = "192.168.1.50"              # Cluster IP Address
-          # $ClusterNetmask = "255.255.255.0"
-          # $ClusterStaticAddress = @("$ClusterIP/$ClusterNetmask")
+          # $ClusterName  = "MyCluster"
+          # $ClusterNodes = @("Node1", "Node2")
+          # $ClusterIP    = "192.168.1.50"
           #
-          # # ---- 1. Install Failover-Clustering Feature ----
-          # Write-Host "Installing Failover Clustering feature..." -ForegroundColor Cyan
-          # Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools -Verbose
-          #
-          # # ---- 2. Install File Server role (Optional but common) ----
-          # Write-Host "Installing File Server role..." -ForegroundColor Cyan
-          # Install-WindowsFeature FS-Fileserver -Verbose
-          #
-          # # ---- 3. Validate the cluster nodes ----
+          # # ---- 1. Validate the cluster ----
           # Write-Host "Validating cluster configuration..." -ForegroundColor Cyan
-          # Test-Cluster -Node $ClusterNodes -Verbose -Ignore "Storage" | Out-File C:\ClusterValidationReport.txt
+          # Test-Cluster -Node $ClusterNodes -Verbose
           #
-          # Write-Host "Validation complete. Report saved to C:\ClusterValidationReport.txt" -ForegroundColor Green
+          # Write-Host "Validation complete." -ForegroundColor Green
           #
-          # # ---- 4. Create the cluster ----
+          # # ---- 2. Create the cluster ----
           # Write-Host "Creating cluster..." -ForegroundColor Cyan
           # New-Cluster `
           #     -Name $ClusterName `
@@ -1070,24 +1070,29 @@ Resources:
           #     -NoStorage `
           #     -Verbose
           #
-          # # ---- 5. Configure cluster network settings ----
-          # Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
-          # Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1 -Verbose
+          # # ---- 3. Verify cluster ----
+          # Get-Cluster
+          # Get-ClusterNode
           #
-          # # ---- 6. Enable CSV (Cluster Shared Volumes) ----
+          # # ---- 4. Configure cluster networks ----
+          # Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
+          # Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1
+          #
+          # # ---- 5. Add disks & enable CSV ----
           # Write-Host "Checking for available disks..." -ForegroundColor Cyan
           # $AvailableDisks = Get-ClusterAvailableDisk
           #
           # if ($AvailableDisks) {
           #     Write-Host "Adding disks to Cluster Shared Volumes..." -ForegroundColor Cyan
-          #     Add-ClusterSharedVolume -InputObject $AvailableDisks -Verbose
+          #     $AvailableDisks | Add-ClusterDisk
+          #     $AvailableDisks | Add-ClusterSharedVolume
           # } else {
-          #     Write-Host "No available disks found. Skipping CSV configuration." -ForegroundColor Yellow
+          #     Write-Host "No available disks found. Skipping CSV." -ForegroundColor Yellow
           # }
           #
-          # # ---- 7. (Optional) Configure Quorum ----
+          # # ---- 6. Configure Quorum ----
           # Write-Host "Configuring quorum (Node Majority)..." -ForegroundColor Cyan
-          # Set-ClusterQuorum -Cluster $ClusterName -NodeMajority
+          # Set-ClusterQuorum -NodeMajority
           #
           # # ---- DONE ----
           # Write-Host "`n====================================="
@@ -1098,7 +1103,6 @@ Resources:
           # Write-Host "=====================================" -ForegroundColor Green
           # 
           # ******************************************************************
-
           
           # domain controller
           Start-Transcript -Path "C:\DomainController.log" -Append
