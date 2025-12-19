@@ -12,6 +12,7 @@
 \babelfont{sf}{Noto Sans}
 \babelfont{tt}{Noto Sans Mono}
 
+
 % Add because main language is not English (Standard Protocol) - though strictly English here, good for consistency
 \usepackage{enumitem}
 \setlist[itemize]{label=-}
@@ -21,6 +22,8 @@
 \usepackage{listings}
 \usepackage{titlesec}
 \usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{caption}
 
 % Hyperref must be loaded last
 \usepackage[hidelinks]{hyperref}
@@ -77,8 +80,9 @@
 \tableofcontents
 \newpage
 
-\section*{Prerequisites}
+\phantomsection
 \addcontentsline{toc}{section}{Prerequisites}
+\section*{Prerequisites}
 
 \subsection*{AWS Account Setup}
 \begin{itemize}
@@ -107,168 +111,132 @@
 \section{File Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.medium or larger\\
-\textbf{Storage:} EBS volumes with provisioned IOPS for performance\\
-\textbf{Security Group Ports:} 445 (SMB), 139 (NetBIOS), 3389 (RDP)
+Instance Name: File Server\\
+Instance Type: t3.medium or larger\\
+Storage: EBS volumes with provisioned IOPS for performance\\
+Security Group Ports: tcp 445 (SMB), tcp 3389 (RDP)
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server EC2 Instance}
-	      \begin{itemize}
-		      \item Select Windows Server 2022 Datacenter
-		      \item Attach additional EBS volumes for file storage
-	      \end{itemize}
-
-	\item \textbf{Install File Server Role}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name FS-FileServer -IncludeManagementTools
-Install-WindowsFeature -Name FS-DFS-Namespace, FS-DFS-Replication
+\begin{lstlisting}[language=bash]
+Install-WindowsFeature -Name FS-FileServer
+New-Item -Path "C:\FileShare" -ItemType Directory -Force
+New-SmbShare -Name "PublicShare" -Path "C:\FileShare" -FullAccess "Everyone"
+echo hello > C:\FileShare\hello.txt
+Write-Host "File Server setup complete."
 \end{lstlisting}
 
-	\item \textbf{Configure Storage}
-	      \begin{itemize}
-		      \item Initialize and format additional EBS volumes
-		      \item Create shared folders
-	      \end{itemize}
-	      \begin{lstlisting}[language=bash]
-New-SmbShare -Name "SharedFiles" -Path "D:\Shares" -FullAccess "Domain\Admins" -ReadAccess "Domain\Users"
-\end{lstlisting}
 
-	\item \textbf{Enable Shadow Copies}
-	      \begin{lstlisting}[language=bash]
-Enable-ComputerRestore -Drive "D:\"
-vssadmin resize shadowstorage /for=D: /on=D: /maxsize=20%
-\end{lstlisting}
-
-	\item \textbf{Configure AWS Backup}
-	      \begin{itemize}
-		      \item Create backup plan for EBS volumes
-		      \item Set retention policies
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use AWS Storage Gateway for hybrid scenarios
-	\item Implement Amazon FSx for Windows File Server for managed solution
-	\item Enable encryption at rest using AWS KMS
-	\item Configure NTFS permissions and share permissions
+	\item connect to Proxy Server or other windows server
+	\item open file explorer and \verb|\\<public dns of File Server>|
+	\item enter credential
 \end{itemize}
+
+% \includegraphics[width=\textwidth]{static/file_server/demo.png}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\textwidth]{static/file_server/demo.png}
+	\caption{Successfully connected to file server}
+	\label{fig:file-server}
+\end{figure}
 
 \newpage
 
 \section{Proxy Server (Caching, Control Access)}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.medium\\
-\textbf{Security Group Ports:} 8080, 3128 (proxy), 3389 (RDP)
+Instance Name: Proxy Server\\
+Instance Type: t3.medium\\
+Security Group Ports: tcp 3128, tcp 3389 (RDP)
 
-\subsection{Implementation Steps}
-
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
-
-	\item \textbf{Install Proxy Server Software}
-	      \begin{itemize}
-		      \item \textbf{Option A: Windows Server with WinGate}\\
-		            Download and install WinGate; Configure proxy settings.
-		      \item \textbf{Option B: Squid for Windows}\\
-		            Download Squid for Windows; Install and configure \texttt{squid.conf}.
-	      \end{itemize}
-
-	\item \textbf{Configure Proxy Settings}
-	      \begin{lstlisting}[language=bash]
-# Example configuration for basic proxy
-netsh winhttp set proxy proxy-server="localhost:8080" bypass-list="*.local"
+\subsection{Implementation}
+\begin{lstlisting}[language=bash]
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install squid -y
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/squid.conf -OutFile "C:\Squid\etc\squid\squid.conf"
+Restart-Service squidsrv
+Write-Host "Proxy Server setup complete."
 \end{lstlisting}
 
-	\item \textbf{Set Up Caching}
-	      \begin{itemize}
-		      \item Configure cache directory on separate EBS volume
-		      \item Set cache size limits
-		      \item Define cache policies
-	      \end{itemize}
 
-	\item \textbf{Access Control}
-	      \begin{itemize}
-		      \item Configure authentication (AD integration)
-		      \item Set up URL filtering rules
-		      \item Implement blacklists/whitelists
-	      \end{itemize}
-
-	\item \textbf{Configure AWS Security Group}
-	      \begin{itemize}
-		      \item Allow inbound traffic on proxy port from specific CIDR blocks
-		      \item Restrict outbound traffic as needed
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use AWS Network Firewall for additional security
-	\item Consider AWS Global Accelerator for multiple regions
-	\item Monitor with CloudWatch metrics
-	\item Use ALB/NLB for proxy clustering
+	\item connect to File Server or other windows server
+	\item change proxy address to \verb|<private ip of Proxy Server>| with port 3128
+	\item open browser
+	\item visit youtube.com => allow
+	\item visit facebook.com => blocked
 \end{itemize}
 
-\newpage
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/proxy_server/allow_youtube.png}
+	\caption{Allow access to youtube}
+
+\end{figure}
+\clearpage
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/proxy_server/block_facebook.png}
+	\caption{Block access to facebook}
+\end{figure}
+
+\clearpage
 
 \section{DNS Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.small\\
-\textbf{Security Group Ports:} 53 (TCP/UDP), 3389 (RDP)
+Instance Name: DNS Server\\
+Instance Type: t3.medium\\
+Security Group Ports: tcp/udp 53, tcp 3389 (RDP)
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
+\begin{lstlisting}[language=bash]
+Install-WindowsFeature DNS -IncludeManagementTools
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
-	      \begin{itemize}
-		      \item Place in private subnet for internal DNS
-	      \end{itemize}
+Add-DnsServerPrimaryZone -Name "example.internal" -ZoneFile "example.internal.dns"
+Add-DnsServerPrimaryZone -Name "devspeed.com" -ZoneFile "devspeed.com.dns"
 
-	\item \textbf{Install DNS Server Role}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name DNS -IncludeManagementTools
+Add-DnsServerResourceRecordA -Name 'server1' -ZoneName 'example.internal' -IPv4Address '10.0.1.10'
+Add-DnsServerResourceRecordA -Name 'console' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.11'
+Add-DnsServerResourceRecordA -Name 'go' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.29'
+Add-DnsServerResourceRecordA -Name 'blog' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.30'
+Add-DnsServerResourceRecordA -Name 'shop' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.31'
+Add-DnsServerResourceRecordA -Name 'support' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.32'
+Add-DnsServerResourceRecordA -Name 'mail' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.33'
+Add-DnsServerResourceRecordA -Name 'www' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.34'
+Add-DnsServerResourceRecordA -Name 'www2' -ZoneName 'devspeed.com' -IPv4Address '192.168.1.100'
+
+# For example, forwarding to Google DNS:
+# Add-DnsServerForwarder -IPAddress "8.8.8.8" -PassThru
+# Or forwarding to AWS VPC DNS (recommended for EC2). This is the Amazon-provided DNS resolver for VPCs.
+# Add-DnsServerForwarder -IPAddress "169.254.169.253" -PassThru
+
+New-NetFirewallRule -DisplayName "Allow DNS TCP 53" -Direction Inbound -Protocol TCP -LocalPort 53 -Action Allow
+New-NetFirewallRule -DisplayName "Allow DNS UDP 53" -Direction Inbound -Protocol UDP -LocalPort 53 -Action Allow
+
 \end{lstlisting}
 
-	\item \textbf{Configure DNS Zones}
-	      \begin{lstlisting}[language=bash]
-# Create Primary Zone
-Add-DnsServerPrimaryZone -Name "yourdomain.local" -ReplicationScope "Forest" -PassThru
 
-# Create Reverse Lookup Zone
-Add-DnsServerPrimaryZone -NetworkID "10.0.0.0/16" -ReplicationScope "Forest"
-\end{lstlisting}
 
-	\item \textbf{Configure Forwarders}
-	      \begin{lstlisting}[language=bash]
-# Use AWS DNS or external DNS
-Add-DnsServerForwarder -IPAddress "8.8.8.8", "8.8.4.4"
-\end{lstlisting}
-
-	\item \textbf{Integrate with AWS Route 53}
-	      \begin{itemize}
-		      \item Create Route 53 Resolver endpoints
-		      \item Configure conditional forwarding for AWS resources
-	      \end{itemize}
-
-	\item \textbf{Configure DHCP Option Sets}
-	      \begin{itemize}
-		      \item Update VPC DHCP options to point to DNS server
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Deploy multiple DNS servers for redundancy
-	\item Use Route 53 for public DNS records
-	\item Enable DNS logging and monitoring
-	\item Implement DNSSEC for security
+	\item open Terminal
+	\item dog www.devspeed.com `@<public ip of dns server>`
+	\item dog go.devspeed.com `@<public ip of dns server>`
+	\item nslookup shop.devspeed.com `<public ip of dns server>`
+	\item nslookup mail.devspeed.com `<public ip of dns server>`
 \end{itemize}
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/dns_server/connect_dns_server.png}
+	\caption{Dns server response with respective IP address}
+\end{figure}
 
-\newpage
+\clearpage
 
 \section{DHCP Server}
 
@@ -319,177 +287,131 @@ Add-DhcpServerInDC -DnsName "dhcp.yourdomain.local" -IPAddress 10.0.1.10
 \section{VPN Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.small to t3.medium\\
-\textbf{Security Group Ports:} 1723 (PPTP), 1701 (L2TP), 500/4500 (IPSec), 443 (SSTP)\\
-\textbf{Elastic IP:} Required for consistent endpoint
+Instance Name: VPN Server\\
+Instance Type: t3.small to t3.medium\\
+Security Group Ports: udp 1194, tcp 3389 (RDP)\\
+Elastic IP: Required for consistent endpoint
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance with Elastic IP}
+\begin{lstlisting}[language=bash]
 
-	\item \textbf{Install Remote Access Role}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name RemoteAccess -IncludeManagementTools
-Install-WindowsFeature -Name DirectAccess-VPN -IncludeManagementTools
-Install-WindowsFeature -Name Routing -IncludeManagementTools
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install openvpn -y  --package-parameters=" /AddToDesktop /Gui /GuiOnLogon /EasyRsa /DcoDriver /TapDriver /WintunDriver /OpenSSL /Service "
+choco install caddy 7zip -y
+
+$cfg = "C:\Program Files\OpenVPN\config"
+
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/dh.pem -OutFile "$cfg\dh.pem"
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/server.crt -OutFile "$cfg\server.crt"
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/server.key -OutFile "$cfg\server.key"
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/ca.crt -OutFile "$cfg\ca.crt"
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/openvpn/server/server.ovpn -OutFile "$cfg\server.ovpn"
+
+Set-Service -Name OpenVPNService -StartupType Automatic
+Start-Service -Name OpenVPNService
+
+New-NetFirewallRule -DisplayName "OpenVPN" -Direction Inbound -Protocol UDP -LocalPort 1194 -Action Allow
+New-NetFirewallRule -DisplayName "ShareFileOpenVPN" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+
+# don't know why it doesn't working. (The server doesn't run)
+# sleep -Seconds 5 # still not working
+# Start-Process "C:\Program Files\OpenVPN\bin\openvpn-gui.exe"
+
+# # for client to openvpn server
+# $cfg = "C:\Program Files\OpenVPN\config"
+# Invoke-WebRequest <url> "$cfg\client1.ovpn"
+# Invoke-WebRequest <url> "$cfg\ca.crt"
+# Invoke-WebRequest <url> "$cfg\client1.crt"
+# Invoke-WebRequest <url> "$cfg\client1.key"
+
 \end{lstlisting}
 
-	\item \textbf{Configure VPN Server}
-	      \begin{lstlisting}[language=bash]
-Install-RemoteAccess -VpnType Vpn
-\end{lstlisting}
-
-	\item \textbf{Configure VPN Protocols}
-	      \begin{itemize}
-		      \item Enable SSTP, L2TP/IPSec, or IKEv2
-		      \item Configure authentication methods (RADIUS, certificates)
-	      \end{itemize}
-
-	\item \textbf{Set Up IP Address Assignment}
-	      \begin{lstlisting}[language=bash]
-Set-VpnServerConfiguration -TunnelType SSTP -PassThru
-\end{lstlisting}
-
-	\item \textbf{Configure Routing}
-	      \begin{itemize}
-		      \item Enable NAT for VPN clients
-		      \item Configure routing tables
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Alternative: AWS Client VPN}
-Consider using AWS Client VPN for managed VPN service with better scalability and integration.
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use certificate-based authentication
-	\item Integrate with AWS Directory Service
-	\item Monitor connections with CloudWatch
-	\item Consider AWS Site-to-Site VPN for office connectivity
+	\item connect to VPN Server
+	\item Open \verb|OpenVPN GUI| to start the server
+	\item connect to File Server
+	\item change \verb|YOUR_PUBLIC_IP| in \verb|C:\Program Files\OpenVPN\config\client1.ovpn| \\
+	      to public ip of the VPN Server
+	\item Open \verb|OpenVPN GUI| to connect to the server
+	\item Open powershell and type \verb|ipconfig| and will see something like:
+
+	      \begin{lstlisting}{language=bash}
+Unknown adapter OpenVPN Data Channel Offload:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::f729:5f67:58f2:7253%17
+   IPv4 Address. . . . . . . . . . . : 10.8.0.6
+   Subnet Mask . . . . . . . . . . . : 255.255.255.252
+   Default Gateway . . . . . . . . . :
+\end{lstlisting}
+
 \end{itemize}
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/vpn_server/connect_vpn_server.png}
+	\caption{vpn client successfully connect to VPN server}
+\end{figure}
 
 \newpage
 
 \section{Terminal Server (Thin Clients)}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.xlarge or larger (based on user count)\\
-\textbf{Security Group Ports:} 3389 (RDP), 3391 (RD Gateway)
+Instance Name: Terminal Server\\
+Instance Type: t3.medium\\
+Security Group Ports: tcp 3389 (RDP)
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
-	      \begin{itemize}
-		      \item Size appropriately for concurrent users (2 vCPU + 4GB RAM per 5-10 users)
-	      \end{itemize}
-
-	\item \textbf{Install RDS Roles}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name RDS-RD-Server -IncludeManagementTools
-Install-WindowsFeature -Name RDS-Connection-Broker -IncludeManagementTools
-Install-WindowsFeature -Name RDS-Web-Access -IncludeManagementTools
-Install-WindowsFeature -Name RDS-Gateway -IncludeManagementTools
-Install-WindowsFeature -Name RDS-Licensing -IncludeManagementTools
+\begin{lstlisting}[language=bash]
+# Install Remote Desktop Session Host Role
+Install-WindowsFeature RDS-RD-Server
+# Enable Multiple Sessions
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server" -Name fSingleSessionPerUser -Value 0
+# Allow RDP Firewall Rule
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+Write-Host "Terminal Server (RDS Session Host) setup complete."
 \end{lstlisting}
 
-	\item \textbf{Configure RDS Deployment}
-	      \begin{itemize}
-		      \item Use Server Manager to create RDS deployment
-		      \item Add RD Session Host
-		      \item Configure RD Gateway for external access
-	      \end{itemize}
-
-	\item \textbf{Install RDS CALs}
-	      \begin{itemize}
-		      \item Install RDS License Server
-		      \item Activate and install Client Access Licenses
-	      \end{itemize}
-
-	\item \textbf{Configure Session Collections}
-	      \begin{lstlisting}[language=bash]
-New-RDSessionCollection -CollectionName "Production" -SessionHost "rdsh01.yourdomain.local" -ConnectionBroker "rdcb.yourdomain.local"
-\end{lstlisting}
-
-	\item \textbf{Set Up RemoteApp}
-	      \begin{lstlisting}[language=bash]
-New-RDRemoteApp -CollectionName "Production" -DisplayName "Microsoft Word" -FilePath "C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE"
-\end{lstlisting}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use RD Gateway with SSL certificates
-	\item Deploy multiple Session Hosts with load balancing
-	\item Use FSLogix for user profile management
-	\item Store user data on separate file server
-	\item Consider Amazon WorkSpaces for managed VDI
+	\item connect to the server with RDP
 \end{itemize}
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/terminal_server/connect_terminal_server.png}
+	\caption{Successfully connect to terminal server}
+\end{figure}
 
 \newpage
 
 \section{Web Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.medium\\
-\textbf{Security Group Ports:} 80 (HTTP), 443 (HTTPS), 3389 (RDP)\\
-\textbf{Load Balancer:} Application Load Balancer recommended
+Instance Name: Web Server\\
+Instance Type: t3.medium\\
+Security Group Ports: tcp 80 (HTTP), tcp 443 (HTTPS), tcp 3389 (RDP)\\
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
-
-	\item \textbf{Install IIS Role}
-	      \begin{lstlisting}[language=bash]
+\begin{lstlisting}{language=bash}
 Install-WindowsFeature -Name Web-Server -IncludeManagementTools
-Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
-Install-WindowsFeature -Name Web-Mgmt-Console
+# Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
+# Install-WindowsFeature -Name Web-Mgmt-Console
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/static/devspeed.html -OutFile "C:\inetpub\wwwroot\index.html"
 \end{lstlisting}
 
-	\item \textbf{Configure IIS}
-	      \begin{lstlisting}[language=bash]
-# Create new website
-New-Website -Name "MyWebsite" -Port 80 -PhysicalPath "C:\inetpub\MyWebsite" -ApplicationPool "DefaultAppPool"
-
-# Create application pool
-New-WebAppPool -Name "MyAppPool"
-Set-ItemProperty IIS:\AppPools\MyAppPool -name "managedRuntimeVersion" -value "v4.0"
-\end{lstlisting}
-
-	\item \textbf{Install SSL Certificate}
-	      \begin{itemize}
-		      \item Request certificate from AWS Certificate Manager
-		      \item Import certificate to IIS
-	      \end{itemize}
-	      \begin{lstlisting}[language=bash]
-New-WebBinding -Name "MyWebsite" -Protocol "https" -Port 443 -SslFlags 0
-\end{lstlisting}
-
-	\item \textbf{Configure Application Settings}
-	      \begin{itemize}
-		      \item Set up .NET Framework or .NET Core
-		      \item Configure connection strings
-		      \item Set permissions for application folders
-	      \end{itemize}
-
-	\item \textbf{Set Up Application Load Balancer}
-	      \begin{itemize}
-		      \item Create target group with health checks
-		      \item Register EC2 instances
-		      \item Configure listener rules
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use AWS Certificate Manager for SSL certificates
-	\item Enable CloudFront for CDN
-	\item Configure auto-scaling for traffic spikes
-	\item Use Amazon RDS instead of local database
-	\item Enable AWS WAF for security
+	\item visit public dns of the server
 \end{itemize}
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/web_server/connect_web_server.png}
+	\caption{visiting the web page}
+\end{figure}
 
 \newpage
 
@@ -501,187 +423,233 @@ New-WebBinding -Name "MyWebsite" -Protocol "https" -Port 443 -SslFlags 0
 \textbf{Elastic IP:} Required\\
 \textbf{Note:} AWS blocks port 25 by default; request removal.
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
 
-\begin{enumerate}
-	\item \textbf{Request Port 25 Unblocking}
-	      \begin{itemize}
-		      \item Submit request to AWS Support
-		      \item Provide reverse DNS setup
-	      \end{itemize}
+\begin{lstlisting}[language=bash]
+# mail server
+# - apache james (smpt server [port: 25], imap server [port: 143])
+# - swaks (smpt client)
+# - thunderbird (email client)
 
-	\item \textbf{Launch Windows Server Instance with Elastic IP}
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install openjdk strawberryperl thunderbird notepadplusplus telnet -y
+Invoke-WebRequest https://www.jetmore.org/john/code/swaks/files/swaks-20240103.0/swaks -OutFile swaks.pl
+Invoke-WebRequest https://dlcdn.apache.org/james/server/3.9.0/james-server-spring-app-3.9.0-app.zip -OutFile james-server-spring-app-3.9.0-app.zip
+Expand-Archive james-server-spring-app-3.9.0-app.zip -DestinationPath james-server-spring-app-3.9.0-app
 
-	\item \textbf{Install SMTP Server}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name SMTP-Server -IncludeManagementTools
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/smtpserver.xml -OutFile "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\conf\smtpserver.xml"
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/imapserver.xml -OutFile "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\conf\imapserver.xml"
+
+Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+refreshenv
+
+# cd "james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\"
+
+$james = "C:\Windows\System32\james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james.bat"
+$james_cli = "C:\Windows\System32\james-server-spring-app-3.9.0-app\james-server-spring-app-3.9.0\bin\james-cli.ps1"
+
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/james-cli.ps1 -OutFile $james_cli
+
+function Wait-JamesReady {
+    param(
+        [int]$Port = 9999,
+        [string]$Url = "localhost",
+        [int]$TimeoutSeconds = 120
+    )
+
+    $start = Get-Date
+
+    Write-Host "Waiting for James server to open JMX on port $Port..."
+
+    while ((Get-Date) -lt $start.AddSeconds($TimeoutSeconds)) {
+        if ((Test-NetConnection -ComputerName $Url -Port $Port -WarningAction SilentlyContinue).TcpTestSucceeded) {
+            Write-Host "James server is ready!"
+            return
+        }
+
+        Start-Sleep -Seconds 2
+    }
+
+    throw "Timeout: James server did not open JMX port $Port"
+}
+
+& $james install
+& $james start
+
+# need to wait james server completely ready
+Wait-JamesReady
+
+& $james_cli -username james-admin -password changeme adddomain example.local
+& $james_cli -username james-admin -password changeme adduser mike@example.local mike
+& $james_cli -username james-admin -password changeme adduser joe@example.local joe
+& $james_cli -username james-admin -password changeme adduser leng@example.local leng
+& $james_cli -username james-admin -password changeme adduser jame@example.local jame
+
+New-NetFirewallRule -DisplayName "Allow smtp 25" -Direction Inbound -Protocol TCP -LocalPort 25 -Action Allow
+New-NetFirewallRule -DisplayName "Allow imap 143" -Direction Inbound -Protocol TCP -LocalPort 143 -Action Allow
+
 \end{lstlisting}
 
-	\item \textbf{Install Third-Party Mail Server}
-	      \begin{itemize}
-		      \item \textbf{Option A: hMailServer (Free)}\\
-		            Download and install hMailServer; Configure domains and accounts; Set up SSL/TLS certificates.
-		      \item \textbf{Option B: Microsoft Exchange Server}\\
-		            More complex but full-featured; Install prerequisites; Install Exchange Server; Configure mailbox databases.
-	      \end{itemize}
-
-	\item \textbf{Configure DNS Records}
-	      \begin{itemize}
-		      \item MX records pointing to Elastic IP
-		      \item SPF, DKIM, and DMARC records
-		      \item Reverse DNS (PTR) record
-	      \end{itemize}
-
-	\item \textbf{Configure Security}
-	      \begin{itemize}
-		      \item Enable spam filtering
-		      \item Configure antivirus scanning
-		      \item Set up SSL/TLS encryption
-		      \item Configure relay restrictions
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Alternative: Amazon SES}
-Consider using Amazon Simple Email Service (SES) for sending emails, which provides better deliverability and doesn't require managing infrastructure.
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use Amazon WorkMail for managed email service
-	\item Implement proper email security (SPF, DKIM, DMARC)
-	\item Configure backup MX records
-	\item Monitor email queues and logs
-	\item Use SES for transactional emails
+	\item Open Thunderbird
+	\item Username: \texttt{jame@example.local}
+	\item Password: \texttt{jame}
+	\item Username: \texttt{mike@example.local}
+	\item Password: \texttt{mike}
+
+	\item IMAP
+	      \begin{itemize}
+		      \item Hostname: \texttt{<public-ip-of-mail-server>}
+		      \item Port: 143
+	      \end{itemize}
+
+	\item SMTP
+	      \begin{itemize}
+		      \item Hostname: \texttt{<public-ip-of-mail-server>}
+		      \item Port: 25
+	      \end{itemize}
 \end{itemize}
 
-\newpage
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/mail_server/connect_mail_server.png}
+	\caption{Two users sending messages to each other}
+\end{figure}
+
+\clearpage
 
 \section{Database Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} r5.large or larger (memory-optimized)\\
-\textbf{Storage:} EBS with provisioned IOPS or io2\\
-\textbf{Security Group Ports:}
+Instance Name: Database Server\\
+Instance Type: t3.medium or larger (memory-optimized)\\
+Storage: EBS with provisioned IOPS or io2\\
+Security Group Ports:
 \begin{itemize}
-	\item MongoDB: 27017
-	\item Oracle: 1521
-	\item SQL Server: 1433
-	\item PostgreSQL: 5432
+	\item PostgreSQL: tcp 5432
+	\item SQL Server: tcp 1433
+	\item MongoDB: tcp 27017
+	\item RDP: tcp 3389
 \end{itemize}
 
-\subsection{Implementation Steps}
-
-\subsubsection{SQL Server}
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
-	      \begin{itemize}
-		      \item Use memory-optimized instance type
-		      \item Attach high-performance EBS volumes
-	      \end{itemize}
-
-	\item \textbf{Install SQL Server}
-	      \begin{itemize}
-		      \item Download SQL Server (Developer/Standard/Enterprise)
-		      \item Run setup.exe
-	      \end{itemize}
-	      \begin{lstlisting}[language=bash]
-# Silent installation example
-Setup.exe /Q /ACTION=Install /FEATURES=SQLEngine /INSTANCENAME=MSSQLSERVER /SQLSYSADMINACCOUNTS="DOMAIN\SQLAdmins" /AGTSVCACCOUNT="NT AUTHORITY\SYSTEM" /SQLSVCACCOUNT="NT AUTHORITY\SYSTEM"
-\end{lstlisting}
-
-	\item \textbf{Configure SQL Server}
-	      \begin{lstlisting}[language=sql]
--- Enable remote connections
-EXEC sys.sp_configure 'remote access', 1;
-RECONFIGURE;
-
--- Configure max memory
-EXEC sys.sp_configure 'max server memory (MB)', 8192;
-RECONFIGURE;
-\end{lstlisting}
-
-	\item \textbf{Set Up Backups}
-	      \begin{itemize}
-		      \item Configure SQL Server backup to S3
-		      \item Use SQL Server native backup to S3
-	      \end{itemize}
-	      \begin{lstlisting}[language=sql]
-BACKUP DATABASE [MyDB] TO URL = 's3://my-bucket/backups/MyDB.bak'
-\end{lstlisting}
-\end{enumerate}
+\subsection{Implementation}
 
 \subsubsection{PostgreSQL}
-\begin{enumerate}
-	\item \textbf{Install PostgreSQL}
-	      \begin{itemize}
-		      \item Download PostgreSQL installer for Windows
-		      \item Run installation wizard
-	      \end{itemize}
 
-	\item \textbf{Configure PostgreSQL}
-	      \begin{lstlisting}[language=bash]
-# Edit postgresql.conf
-listen_addresses = '*'
-max_connections = 100
-shared_buffers = 2GB
-
-# Edit pg_hba.conf for authentication
-host all all 0.0.0.0/0 md5
+\begin{lstlisting}[language=bash]
+ # postgresql
+ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+ # username postgres
+ choco install postgresql11 --params '/Password:test /AllowRemote' -y
+ Restart-Service postgresql-x64-11
+ New-NetFirewallRule -DisplayName "Allow PostgreSQL 5432" `
+   -Direction Inbound `
+   -Protocol TCP `
+   -LocalPort 5432 `
+   -Action Allow
 \end{lstlisting}
 
-	\item \textbf{Create Database}
-	      \begin{lstlisting}[language=sql]
-CREATE DATABASE myapp;
-CREATE USER appuser WITH ENCRYPTED PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE myapp TO appuser;
-\end{lstlisting}
-\end{enumerate}
+\subsubsection{SQL Server}
+ \begin{lstlisting}[language=bash]
+ # sql server
+ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+ choco install mssqlserver2014express -y
+ choco install sqlserver-cmdlineutils -y
 
+ # Get access to SqlWmiManagement DLL on the machine with SQL
+ # we are on, which is where SQL Server was installed.
+ # Note: This is installed in the GAC by SQL Server Setup.
+
+ # Load the WMI assembly
+ [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SqlWmiManagement') | Out-Null
+
+ # Connect to local SQL Server machine
+ $wmi = New-Object 'Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer' 'localhost'
+
+ # Get TCP protocol for SQLEXPRESS
+ $tcp = $wmi.ServerInstances['SQLEXPRESS'].ServerProtocols['Tcp']
+ $tcp.IsEnabled = $true
+
+ # Disable dynamic ports on each IP entry
+ foreach ($ip in $tcp.IPAddresses) {
+     $ip.IPAddressProperties["TcpDynamicPorts"].Value = ""
+ }
+
+ # Set static port 1433 on ALL IPs (including IPAll)
+ foreach ($ip in $tcp.IPAddresses) {
+     $ip.IPAddressProperties["TcpPort"].Value = "1433"
+ }
+
+ # Apply configuration
+ $tcp.Alter()
+
+ # You need to restart SQL Server for the change to persist
+ # -Force takes care of any dependent services, like SQL Agent.
+ # Note: If the instance is named, replace MSSQLSERVER with MSSQL$ followed by
+ # the name of the instance (e.g., MSSQL$MYINSTANCE)
+
+ Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
+
+ & "C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\SQLCMD.EXE"  -S .\SQLEXPRESS -Q "ALTER LOGIN sa ENABLE; ALTER LOGIN sa WITH PASSWORD = 'mypassword@2025';"
+ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.SQLEXPRESS\MSSQLServer" -Name LoginMode -Value 2
+ Restart-Service -Name 'MSSQL$SQLEXPRESS' -Force
+
+ New-NetFirewallRule -DisplayName "Allow SQL Server 1433" `
+   -Direction Inbound `
+   -Protocol TCP `
+   -LocalPort 1433 `
+   -Action Allow
+
+\end{lstlisting}
 \subsubsection{MongoDB}
-\begin{enumerate}
-	\item \textbf{Install MongoDB}
-	      \begin{itemize}
-		      \item Download MongoDB Community Server for Windows
-		      \item Install as Windows Service
-	      \end{itemize}
-
-	\item \textbf{Configure MongoDB}
-	      \begin{lstlisting}[language=bash]
-# Edit mongod.cfg
-net:
-  port: 27017
-  bindIp: 0.0.0.0
-security:
-  authorization: enabled
-storage:
-  dbPath: D:\MongoDB\data
+ \begin{lstlisting}[language=bash]
+ # mongodb
+ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+ choco install mongodb -y
+ choco install mongodb-shell -y
+ Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/config/mongod.cfg -OutFile "C:\Program Files\MongoDB\Server\8.2\bin\mongod.cfg"
+ Restart-Service MongoDB
+ New-NetFirewallRule -DisplayName "Allow MongoDB 27017" `
+   -Direction Inbound `
+   -Protocol TCP `
+   -LocalPort 27017 `
+   -Action Allow
 \end{lstlisting}
 
-	\item \textbf{Create Admin User}
-	      \begin{lstlisting}[language=bash]
-use admin
-db.createUser({
-  user: "admin",
-  pwd: "password",
-  roles: [ { role: "root", db: "admin" } ]
-})
-\end{lstlisting}
-\end{enumerate}
-
-\subsection{Alternative: Amazon RDS}
-Consider using Amazon RDS for SQL Server, PostgreSQL, or Oracle for fully managed database service with automated backups, patching, and high availability.
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use Amazon RDS for managed database services
-	\item Enable automated backups
-	\item Use Multi-AZ deployments for high availability
-	\item Store database files on separate EBS volumes
-	\item Enable encryption at rest
-	\item Use IAM database authentication where possible
-	\item Monitor with CloudWatch and Performance Insights
+\item MongoDB
+\begin{itemize}
+  \item mongosh \texttt{<public ip of mongodb server>}
+\end{itemize}
+\item SQL Server
+\begin{itemize}
+\item /opt/mssql-tools18/bin/sqlcmd -S \texttt{<public ip of sql server>} -C -U sa -P mypassword@2025
+\end{itemize}
+\item PostgreSQL
+\begin{itemize}
+  \item psql -h \texttt{<public ip of postgresql server>} -U postgres
+  \item password: test
+\end{itemize}
 \end{itemize}
 
-\newpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/database_server/postgresql.png}
+	\caption{Client using postgresql server}
+\end{figure}
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/database_server/sql_server.png}
+	\caption{client using sql server}
+\end{figure}
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/database_server/mongodb.png}
+	\caption{client using mongodb server}
+\end{figure}
+
+\clearpage
 
 \section{Backup Server}
 
