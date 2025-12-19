@@ -41,12 +41,14 @@
 \contentsline {subsection}{\numberline {9.3}Usage}{18}{subsection.9.3}%
 \contentsline {section}{\numberline {10}Backup Server}{21}{section.10}%
 \contentsline {subsection}{\numberline {10.1}AWS Configuration}{21}{subsection.10.1}%
-\contentsline {subsection}{\numberline {10.2}Implementation Steps}{21}{subsection.10.2}%
-\contentsline {subsection}{\numberline {10.3}Best Practices}{21}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.2}Implementation}{21}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Usage}{21}{subsection.10.3}%
 \contentsline {section}{\numberline {11}Load Balancing}{23}{section.11}%
 \contentsline {subsection}{\numberline {11.1}AWS Configuration}{23}{subsection.11.1}%
 \contentsline {subsection}{\numberline {11.2}Implementation Steps}{23}{subsection.11.2}%
-\contentsline {subsection}{\numberline {11.3}Best Practices}{24}{subsection.11.3}%
+\contentsline {subsubsection}{\numberline {11.2.1}Server 1}{23}{subsubsection.11.2.1}%
+\contentsline {subsubsection}{\numberline {11.2.2}Server 2}{23}{subsubsection.11.2.2}%
+\contentsline {subsection}{\numberline {11.3}Usage}{23}{subsection.11.3}%
 \contentsline {section}{\numberline {12}Failover Cluster}{25}{section.12}%
 \contentsline {subsection}{\numberline {12.1}AWS Configuration}{25}{subsection.12.1}%
 \contentsline {subsection}{\numberline {12.2}Implementation Steps}{25}{subsection.12.2}%
@@ -54,17 +56,13 @@
 \contentsline {subsection}{\numberline {12.4}Best Practices}{26}{subsection.12.4}%
 \contentsline {section}{\numberline {13}FTP Server}{27}{section.13}%
 \contentsline {subsection}{\numberline {13.1}AWS Configuration}{27}{subsection.13.1}%
-\contentsline {subsection}{\numberline {13.2}Implementation Steps}{27}{subsection.13.2}%
-\contentsline {subsection}{\numberline {13.3}Alternative: AWS Transfer Family}{28}{subsection.13.3}%
-\contentsline {subsection}{\numberline {13.4}Best Practices}{28}{subsection.13.4}%
-\contentsline {section}{\numberline {14}Container (Docker)}{29}{section.14}%
-\contentsline {subsection}{\numberline {14.1}AWS Configuration}{29}{subsection.14.1}%
-\contentsline {subsection}{\numberline {14.2}Implementation Steps}{29}{subsection.14.2}%
-\contentsline {subsection}{\numberline {14.3}Alternative: Amazon ECS for Windows Containers}{30}{subsection.14.3}%
-\contentsline {subsubsection}{\numberline {14.3.1}ECS Windows Container Setup}{30}{subsubsection.14.3.1}%
-\contentsline {subsection}{\numberline {14.4}Best Practices}{31}{subsection.14.4}%
-\contentsline {section}{\numberline {15}Domain Controller}{32}{section.15}%
-\contentsline {subsection}{\numberline {15.1}AWS Configuration}{32}{subsection.15.1}%
-\contentsline {subsection}{\numberline {15.2}Installation Steps}{32}{subsection.15.2}%
-\contentsline {subsection}{\numberline {15.3}Installation Steps - PowerShell}{33}{subsection.15.3}%
-\contentsline {subsection}{\numberline {15.4}Security Best Practices}{35}{subsection.15.4}%
+\contentsline {subsection}{\numberline {13.2}Implementation}{27}{subsection.13.2}%
+\contentsline {subsection}{\numberline {13.3}Usage}{29}{subsection.13.3}%
+\contentsline {section}{\numberline {14}Container (Docker)}{30}{section.14}%
+\contentsline {subsection}{\numberline {14.1}AWS Configuration}{30}{subsection.14.1}%
+\contentsline {subsection}{\numberline {14.2}Implementation}{30}{subsection.14.2}%
+\contentsline {subsection}{\numberline {14.3}Usage}{30}{subsection.14.3}%
+\contentsline {section}{\numberline {15}Domain Controller}{31}{section.15}%
+\contentsline {subsection}{\numberline {15.1}AWS Configuration}{31}{subsection.15.1}%
+\contentsline {subsection}{\numberline {15.2}Installation}{31}{subsection.15.2}%
+\contentsline {subsection}{\numberline {15.3}Usage}{31}{subsection.15.3}%

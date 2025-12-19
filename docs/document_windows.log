@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.31)  19 DEC 2025 20:47
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.31)  19 DEC 2025 23:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -717,13 +717,27 @@ File: static/database_server/mongodb.png Graphic file (type bmp)
 [21
 
 ]
+File: static/backup_server/backup_server.png Graphic file (type bmp)
+<static/backup_server/backup_server.png>
 
-[22]
 
-[23]
+[22
 
-[24]
-Overfull \hbox (9.67876pt too wide) in paragraph at lines 852--853
+]
+
+[23
+
+]
+File: static/load_balancing/server_1.png Graphic file (type bmp)
+<static/load_balancing/server_1.png>
+File: static/load_balancing/server_2.png Graphic file (type bmp)
+<static/load_balancing/server_2.png>
+
+
+[24
+
+]
+Overfull \hbox (9.67876pt too wide) in paragraph at lines 803--804
 []\TU/NotoSans(0)/m/n/10.95 Use FSx for shared storage; Configure SQL Server on
  cluster nodes;
  []
@@ -733,38 +747,45 @@ Overfull \hbox (9.67876pt too wide) in paragraph at lines 852--853
 [25]
 
 [26]
+Underfull \hbox (badness 10000) in paragraph at lines 822--825
+
+ []
+
+
 
 [27]
 
 [28]
+File: static/ftp_server/ftp_server.png Graphic file (type bmp)
+<static/ftp_server/ftp_server.png>
+
 
 [29]
+File: static/docker/docker.png Graphic file (type bmp)
+<static/docker/docker.png>
 
-[30]
 
-[31]
+[30
 
-[32]
+]
 
-[33]
+[31
 
-[34]
-
-[35] (./document_windows.aux)
+] (./document_windows.aux)
  ***********
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-07-19>
  ***********
 Package rerunfilecheck Info: File `document_windows.out' has not changed.
-(rerunfilecheck)             Checksum: EC39C4E00C2A863617A0DE2C85F7A55F;9532.
+(rerunfilecheck)             Checksum: E198436F58BB05AE56F24E9EB851EE4B;8366.
  ) 
 Here is how much of TeX's memory you used:
- 16571 strings out of 469991
- 318518 string characters out of 5479681
- 1324815 words of memory out of 5000000
- 44722 multiletter control sequences out of 15000+600000
- 631109 words of font info for 87 fonts, out of 8000000 for 9000
+ 16521 strings out of 469991
+ 318676 string characters out of 5479681
+ 1378815 words of memory out of 5000000
+ 44664 multiletter control sequences out of 15000+600000
+ 631101 words of font info for 86 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 73i,6n,99p,414b,1918s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 73i,6n,99p,395b,1783s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on document_windows.pdf (35 pages).
+Output written on document_windows.pdf (31 pages).

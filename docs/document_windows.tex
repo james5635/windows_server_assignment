@@ -551,7 +551,7 @@ Security Group Ports:
 \end{lstlisting}
 
 \subsubsection{SQL Server}
- \begin{lstlisting}[language=bash]
+\begin{lstlisting}[language=bash]
  # sql server
  Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
  choco install mssqlserver2014express -y
@@ -603,7 +603,7 @@ Security Group Ports:
 
 \end{lstlisting}
 \subsubsection{MongoDB}
- \begin{lstlisting}[language=bash]
+\begin{lstlisting}[language=bash]
  # mongodb
  Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
  choco install mongodb -y
@@ -619,19 +619,19 @@ Security Group Ports:
 
 \subsection{Usage}
 \begin{itemize}
-\item MongoDB
-\begin{itemize}
-  \item mongosh \texttt{<public ip of mongodb server>}
-\end{itemize}
-\item SQL Server
-\begin{itemize}
-\item /opt/mssql-tools18/bin/sqlcmd -S \texttt{<public ip of sql server>} -C -U sa -P mypassword@2025
-\end{itemize}
-\item PostgreSQL
-\begin{itemize}
-  \item psql -h \texttt{<public ip of postgresql server>} -U postgres
-  \item password: test
-\end{itemize}
+	\item MongoDB
+	      \begin{itemize}
+		      \item mongosh \texttt{<public ip of mongodb server>}
+	      \end{itemize}
+	\item SQL Server
+	      \begin{itemize}
+		      \item /opt/mssql-tools18/bin/sqlcmd -S \texttt{<public ip of sql server>} -C -U sa -P mypassword@2025
+	      \end{itemize}
+	\item PostgreSQL
+	      \begin{itemize}
+		      \item psql -h \texttt{<public ip of postgresql server>} -U postgres
+		      \item password: test
+	      \end{itemize}
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -654,140 +654,91 @@ Security Group Ports:
 \section{Backup Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.medium\\
-\textbf{Storage:} Large EBS volumes or S3 integration\\
-\textbf{IAM Role:} Permissions for S3, EBS snapshots
+Instance Type: t3.medium\\
+Security Group Ports: tcp 3389 (RDP)\\
+Storage: Large EBS volumes or S3 integration\\
+IAM Role: Permissions for S3, EBS snapshots
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
+\begin{lstlisting}[language=bash]
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install awscli -y
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
+Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+refreshenv
 
-	\item \textbf{Install Windows Server Backup}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name Windows-Server-Backup -IncludeManagementTools
+$bucket = (New-Guid).ToString()
+echo $bucket > "C:\bucket.txt"
+
+aws s3 mb "s3://$bucket"
+
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/S3Backup.ps1 -OutFile "C:\S3Backup.ps1"
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/S3BackupSchedule.ps1 -OutFile "C:\S3BackupSchedule.ps1"
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/scripts/S3BackupScheduleNightly.ps1 -OutFile "C:\S3BackupScheduleNightly.ps1"
+
+& "C:\S3BackupSchedule.ps1"
+& "C:\S3BackupScheduleNightly.ps1"
+
 \end{lstlisting}
 
-	\item \textbf{Configure AWS Backup}
-	      \begin{itemize}
-		      \item Set up AWS Backup service
-		      \item Create backup plans
-		      \item Assign resources to backup plans
-	      \end{itemize}
-
-	\item \textbf{Install Third-Party Backup Software}
-	      \begin{itemize}
-		      \item \textbf{Option A: Veeam Backup}\\
-		            Download Veeam Backup \& Replication; Install and configure; Set up backup jobs to S3.
-		      \item \textbf{Option B: Windows Server Backup to S3}
-	      \end{itemize}
-	      \begin{lstlisting}[language=bash]
-# Create backup policy
-$Policy = New-WBPolicy
-$Target = New-WBBackupTarget -VolumePath "D:"
-Add-WBBackupTarget -Policy $Policy -Target $Target
-Add-WBVolume -Policy $Policy -Volume (Get-WBVolume -VolumePath "C:")
-Set-WBSchedule -Policy $Policy -Schedule 02:00
-Set-WBPolicy -Policy $Policy
-\end{lstlisting}
-
-	\item \textbf{Configure S3 Lifecycle Policies}
-	      \begin{itemize}
-		      \item Transition to S3 Glacier for long-term retention
-		      \item Set expiration policies
-	      \end{itemize}
-
-	\item \textbf{Set Up EBS Snapshot Automation}
-	      \begin{lstlisting}[language=bash]
-# Using AWS PowerShell
-New-EC2Snapshot -VolumeId vol-12345678 -Description "Daily Backup"
-\end{lstlisting}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use AWS Backup for centralized backup management
-	\item Store backups in S3 with versioning enabled
-	\item Implement 3-2-1 backup strategy
-	\item Test backup restoration regularly
-	\item Use S3 Glacier for long-term archival
-	\item Enable cross-region backup replication
+	\item automatically backup \verb|"C:\inetpub"| to s3 bucket every 1 minute and every night at 2 a.m.
+	\item check out the s3 bucket
 \end{itemize}
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/backup_server/backup_server.png}
+	\caption{automatically backup to s3 bucket}
+\end{figure}
 
-\newpage
+\clearpage
 
 \section{Load Balancing}
 
 \subsection{AWS Configuration}
-\textbf{Service:} Application Load Balancer (ALB) or Network Load Balancer (NLB)\\
-\textbf{Target Group:} Multiple Windows Server instances
+Service: Application Load Balancer (ALB)\\
+Target Group: Multiple Windows Server instances\\
+Instance Type: t3.medium\\
+Security Group Ports: tcp 3389 (RDP)
 
 \subsection{Implementation Steps}
-
-\begin{enumerate}
-	\item \textbf{Launch Multiple Windows Server Instances}
-	      \begin{itemize}
-		      \item Deploy identical servers in different availability zones
-		      \item Install and configure web application on all instances
-	      \end{itemize}
-
-	\item \textbf{Create Target Group}
-	      \begin{itemize}
-		      \item Navigate to EC2 > Target Groups
-		      \item Create target group with health check settings
-	      \end{itemize}
-	      \begin{verbatim}
-Protocol: HTTP/HTTPS
-Port: 80/443
-Health Check Path: /health
-Health Check Interval: 30 seconds
-Healthy Threshold: 2
-Unhealthy Threshold: 2
-\end{verbatim}
-
-	\item \textbf{Create Application Load Balancer}
-	      \begin{itemize}
-		      \item Choose ALB for HTTP/HTTPS traffic
-		      \item Select availability zones
-		      \item Configure security groups
-		      \item Add listener rules
-		      \item Register target group
-	      \end{itemize}
-
-	\item \textbf{Configure Session Persistence}
-	      \begin{itemize}
-		      \item Enable sticky sessions if needed
-		      \item Configure duration
-	      \end{itemize}
-
-	\item \textbf{Set Up Auto Scaling Group}
-	      \begin{lstlisting}[language=bash]
-# Using AWS CLI or CloudFormation
-# Define launch template
-# Create auto-scaling group
-# Configure scaling policies
+\subsubsection{Server 1}
+\begin{lstlisting}[language=bash]
+Start-Transcript -Path "C:\WebServer.log" -Append
+Install-WindowsFeature -Name Web-Server
+# echo "Server 1" > C:\inetpub\wwwroot\index.html
+\end{lstlisting}
+\subsubsection{Server 2}
+\begin{lstlisting}[language=bash]
+Install-WindowsFeature -Name Web-Server -IncludeManagementTools
+# Install-WindowsFeature -Name Web-Asp-Net45, Web-Net-Ext45
+# Install-WindowsFeature -Name Web-Mgmt-Console
+Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_assignment/refs/heads/main/static/devspeed.html -OutFile "C:\inetpub\wwwroot\index.html"
 \end{lstlisting}
 
-	\item \textbf{Install and Configure IIS ARR (Alternative)}
-	      \begin{lstlisting}[language=bash]
-# For Windows-based load balancing
-Install-WindowsFeature Web-Server -IncludeManagementTools
-# Install Application Request Routing
-# Configure server farms
-\end{lstlisting}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use ALB for HTTP/HTTPS traffic
-	\item Use NLB for TCP/UDP traffic or ultra-low latency
-	\item Deploy instances across multiple availability zones
-	\item Configure proper health checks
-	\item Enable access logs for troubleshooting
-	\item Use CloudWatch for monitoring
-	\item Implement auto-scaling based on metrics
+\item manually configure load balancer (application load balancer)
+\item name: devspeedlb
+\item select all availability Zones and subnets
+\item create target group (name: web)
+\item
+    \begin{itemize}
+        \item include WebServerMailServer \& Docker
+    \end{itemize}
+\item choose 'web' as target group
+\item add tcp (port 80) to inbound rule of the load balancer's security group
 \end{itemize}
-
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/load_balancing/server_1.png}
+	\caption{load balance to server 1}
+\end{figure}
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/load_balancing/server_2.png}
+	\caption{load balance to server 2}
+\end{figure}
 \newpage
 
 \section{Failover Cluster}
@@ -868,427 +819,192 @@ Add-ClusterServerRole -Name "SQL-Cluster" -Storage "Cluster Disk 1"
 \section{FTP Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.small to t3.medium\\
-\textbf{Security Group Ports:} 21 (FTP Control), 20 (FTP Data), 990 (FTPS), Range for Passive Mode (e.g., 50000-50100)\\
-\textbf{Elastic IP:} Required for consistent access
+Instance Name: FTP Server\\
+Instance Type: t3.small to t3.medium\\
+Security Group Ports: tcp 21, tcp 50000-51000, tcp 3389 (RDP)\\
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance with Elastic IP}
+\begin{lstlisting}[language=bash]
+#Install IIS Feature
+Install-WindowsFeature -Name Web-Server -IncludeManagementTools
 
-	\item \textbf{Install FTP Server Role}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name Web-Ftp-Server -IncludeManagementTools
-Install-WindowsFeature -Name Web-Ftp-Service
+#Install FTP feature
+Install-WindowsFeature -Name Web-Ftp-Server -IncludeAllSubFeature -IncludeManagementTools -Verbose
+
+#Creating new FTP site
+$SiteName = "Demo FTP Site"
+$RootFolderpath = "C:\inetpub\ftproot"
+$PortNumber = 21
+$FTPUserGroupName = "Demo FTP Users Group"
+$FTPUserName = "jame"
+$FTPPassword = ConvertTo-SecureString "Mypassword@2025" -AsPlainText -Force
+
+if (!(Test-Path $RootFolderpath)) {
+    # if the folder doesn't exist
+    New-Item -Path $RootFolderpath -ItemType Directory # create the folder
+}
+
+New-WebFtpSite -Name $SiteName -PhysicalPath $RootFolderpath -Port $PortNumber -Verbose -Force
+
+#Creating the local Windows group
+if (!(Get-LocalGroup $FTPUserGroupName  -ErrorAction SilentlyContinue)) {
+    #if the group doesn't exist
+    New-LocalGroup -Name $FTPUserGroupName `
+        -Description "Members of this group can connect to FTP server" #create the group
+}
+
+# Creating an FTP user
+If (!(Get-LocalUser $FTPUserName -ErrorAction SilentlyContinue)) {
+    New-LocalUser -Name $FTPUserName -Password $FTPPassword `
+        -Description "User account to access FTP server" `
+        -UserMayNotChangePassword
+}
+
+# Add the created FTP user to the group Demo FTP Users Group
+Add-LocalGroupMember -Name $FTPUserGroupName -Member $FTPUserName -ErrorAction SilentlyContinue
+
+# Enabling basic authentication on the FTP site
+$param = @{
+    Path    = 'IIS:\Sites\Demo FTP Site'
+    Name    = 'ftpserver.security.authentication.basicauthentication.enabled'
+    Value   = $true
+    Verbose = $True
+}
+Set-ItemProperty @param
+
+# Adding authorization rule to allow FTP users
+# in the FTP group to access the FTP site
+$param = @{
+    PSPath   = 'IIS:\'
+    Location = $SiteName
+    Filter   = '/system.ftpserver/security/authorization'
+#    Value    = @{ accesstype = 'Allow'; roles = $FTPUserGroupName; permissions = 1 }
+    Value    = @{ accesstype = 'Allow'; roles = $FTPUserGroupName; permissions = 3 }
+}
+
+Add-WebConfiguration @param
+
+# Changing SSL policy of the FTP site
+'ftpServer.security.ssl.controlChannelPolicy', 'ftpServer.security.ssl.dataChannelPolicy' |
+ForEach-Object {
+    Set-ItemProperty -Path "IIS:\Sites\Demo FTP Site" -Name $_ -Value $false
+}
+
+# can be 'ReadAndExecute', 'Modify'
+$ACLObject = Get-Acl -Path $RootFolderpath
+$ACLObject.SetAccessRule(
+    ( # Access rule object
+        New-Object System.Security.AccessControl.FileSystemAccessRule(
+            $FTPUserGroupName,
+            'FullControl',
+            'ContainerInherit,ObjectInherit',
+            'None',
+            'Allow'
+        )
+    )
+)
+Set-Acl -Path $RootFolderpath -AclObject $ACLObject
+
+# Checking the NTFS permissions on the FTP root folder
+Get-Acl -Path $RootFolderpath | ForEach-Object Access
+
+# Test FTP Port and FTP access
+Test-NetConnection -ComputerName localhost -Port 21
+
+
+Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.ftpServer/firewallSupport" -name "lowDataChannelPort" -value 50000
+Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST'  -filter "system.ftpServer/firewallSupport" -name "highDataChannelPort" -value 51000
+
+Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.applicationHost/sites/site[@name='Demo FTP Site']/ftpServer/firewallSupport" -name "externalIp4Address" -value "${MyEIP}"
+
+# Control port
+New-NetFirewallRule -DisplayName "Allow FTP 21" -Direction Inbound -Protocol TCP -LocalPort 21 -Action Allow
+
+# Passive ports
+New-NetFirewallRule -DisplayName "Allow FTP Passive Ports" -Direction Inbound -Protocol TCP -LocalPort 50000-51000 -Action Allow
+
+Restart-Service FTPSVC
+
+# C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch380802110\UserScript.ps1
+# apple
+
+echo hello > "C:\inetpub\ftproot\hello.txt"
+
 \end{lstlisting}
 
-	\item \textbf{Configure FTP Site}
-	      \begin{lstlisting}[language=bash]
-# Create FTP site
-New-WebFtpSite -Name "FTP Site" -Port 21 -PhysicalPath "D:\FTP"
-
-# Configure authentication
-Set-WebConfigurationProperty -Filter /system.ftpServer/security/authentication/basicAuthentication -PSPath IIS:\ -Location "FTP Site" -Name enabled -Value $true
-\end{lstlisting}
-
-	\item \textbf{Configure Passive Mode}
-	      \begin{lstlisting}[language=bash]
-# Set passive port range
-Set-WebConfigurationProperty -Filter /system.ftpServer/firewallSupport -PSPath IIS:\ -Name lowDataChannelPort -Value 50000
-Set-WebConfigurationProperty -Filter /system.ftpServer/firewallSupport -PSPath IIS:\ -Name highDataChannelPort -Value 50100
-
-# Set external IP
-Set-WebConfigurationProperty -Filter /system.ftpServer/firewallSupport -PSPath IIS:\ -Name externalIp4Address -Value "YOUR_ELASTIC_IP"
-\end{lstlisting}
-
-	\item \textbf{Enable FTPS (FTP over SSL)}
-	      \begin{lstlisting}[language=bash]
-# Import SSL certificate
-$cert = New-SelfSignedCertificate -DnsName "ftp.yourdomain.com" -CertStoreLocation cert:\LocalMachine\My
-
-# Bind certificate to FTP site
-Set-WebConfigurationProperty -Filter /system.ftpServer/security/ssl -PSPath IIS:\ -Location "FTP Site" -Name serverCertHash -Value $cert.Thumbprint
-Set-WebConfigurationProperty -Filter /system.ftpServer/security/ssl -PSPath IIS:\ -Location "FTP Site" -Name ssl128 -Value $true
-\end{lstlisting}
-
-	\item \textbf{Configure User Access}
-	      \begin{lstlisting}[language=bash]
-# Create FTP user
-New-LocalUser -Name "ftpuser" -Password (ConvertTo-SecureString "Password123!" -AsPlainText -Force)
-
-# Set folder permissions
-$acl = Get-Acl "D:\FTP"
-$permission = "ftpuser","FullControl","Allow"
-$accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule $permission
-$acl.SetAccessRule($accessRule)
-Set-Acl "D:\FTP" $acl
-\end{lstlisting}
-
-	\item \textbf{Configure Security Group}
-	      \begin{itemize}
-		      \item Allow port 21 (control)
-		      \item Allow passive port range (50000-50100)
-		      \item Restrict source IPs if possible
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Alternative: AWS Transfer Family}
-Consider using AWS Transfer Family (SFTP, FTPS, FTP) for fully managed file transfer service with S3 backend.
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use FTPS or SFTP instead of plain FTP
-	\item Use AWS Transfer Family for managed solution
-	\item Store files on S3 via AWS Transfer Family
-	\item Limit source IP addresses in security groups
-	\item Use separate EBS volume for FTP data
-	\item Monitor with CloudWatch logs
-	\item Regular security audits
+\item use filezilla (port 21)
+\item username: jame
+\item password: Mypassword@2025
 \end{itemize}
 
-\newpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/ftp_server/ftp_server.png}
+	\caption{FileZilla successfully connected to ftp server}
+\end{figure}
+\clearpage
 
 \section{Container (Docker)}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.medium or larger\\
-\textbf{Operating System:} Windows Server 2019/2022 with Containers\\
-\textbf{Security Group Ports:} Custom ports based on containerized applications
+Instance Type: t3.medium or larger\\
+Operating System: Windows Server 2019/2022 with Containers\\
+Security Group Ports: Custom ports based on containerized applications
 
-\subsection{Implementation Steps}
+\subsection{Implementation}
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
-	      \begin{itemize}
-		      \item Choose Windows Server 2019/2022
-		      \item Select version with container support
-	      \end{itemize}
-
-	\item \textbf{Install Docker}
-	      \begin{lstlisting}[language=bash]
-# Install Docker provider
-Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
-
-# Install Docker
-Install-Package -Name docker -ProviderName DockerMsftProvider -Force
-
-# Restart computer
-Restart-Computer -Force
+\begin{lstlisting}[language=bash]
+Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/Windows-Containers/Main/helpful_tools/Install-DockerCE/install-docker-ce.ps1" -o install-docker-ce.ps1
+.\install-docker-ce.ps1
+# will restart the machine
 \end{lstlisting}
 
-	\item \textbf{Verify Docker Installation}
-	      \begin{lstlisting}[language=bash]
-docker version
-docker info
-\end{lstlisting}
-
-	\item \textbf{Pull Windows Container Images}
-	      \begin{lstlisting}[language=bash]
-# Pull Windows Server Core base image
-docker pull mcr.microsoft.com/windows/servercore:ltsc2022
-
-# Pull .NET Framework image
-docker pull mcr.microsoft.com/dotnet/framework/aspnet:4.8
-\end{lstlisting}
-
-	\item \textbf{Create Dockerfile}
-	      \begin{lstlisting}[language=bash]
-FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8
-WORKDIR /inetpub/wwwroot
-COPY ./app .
-EXPOSE 80
-\end{lstlisting}
-
-	\item \textbf{Build and Run Container}
-	      \begin{lstlisting}[language=bash]
-# Build image
-docker build -t mywebapp:v1 .
-
-# Run container
-docker run -d -p 80:80 --name webapp mywebapp:v1
-
-# View running containers
-docker ps
-\end{lstlisting}
-
-	\item \textbf{Push to Amazon ECR}
-	      \begin{lstlisting}[language=bash]
-# Authenticate to ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
-
-# Tag image
-docker tag mywebapp:v1 ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/mywebapp:v1
-
-# Push image
-docker push ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/mywebapp:v1
-\end{lstlisting}
-\end{enumerate}
-
-\subsection{Alternative: Amazon ECS for Windows Containers}
-Use Amazon Elastic Container Service (ECS) or Amazon Elastic Kubernetes Service (EKS) with Windows support for orchestrated container deployments.
-
-\subsubsection{ECS Windows Container Setup}
-\begin{enumerate}
-	\item \textbf{Create ECS Cluster}
-	      \begin{itemize}
-		      \item Choose EC2 launch type with Windows AMI
-		      \item Or use Fargate for Windows (when available)
-	      \end{itemize}
-
-	\item \textbf{Create Task Definition}
-	      \begin{lstlisting}[language=bash]
-{
-  "family": "windows-webapp",
-  "containerDefinitions": [
-    {
-      "name": "webapp",
-      "image": "ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/mywebapp:v1",
-      "memory": 2048,
-      "cpu": 1024,
-      "portMappings": [
-        {
-          "containerPort": 80,
-          "protocol": "tcp"
-        }
-      ]
-    }
-  ],
-  "requiresCompatibilities": ["EC2"],
-  "networkMode": "awsvpc",
-  "runtimePlatform": {
-    "operatingSystemFamily": "WINDOWS_SERVER_2022_CORE"
-  }
-}
-\end{lstlisting}
-
-	\item \textbf{Create ECS Service}
-	      \begin{itemize}
-		      \item Deploy task definition
-		      \item Configure load balancer
-		      \item Set desired task count
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Use Amazon ECS or EKS for production container orchestration
-	\item Store images in Amazon ECR
-	\item Use Windows Server Core or Nano Server base images
-	\item Implement CI/CD with AWS CodePipeline
-	\item Monitor containers with CloudWatch Container Insights
-	\item Use Task roles for AWS service access
-	\item Regular image security scanning
+\item connect to the Docker ec2 instance
+\item docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
+\item docker pull mcr.microsoft.com/windows/servercore:ltsc2022 (optional)
+\item docker run -it <image>
 \end{itemize}
 
-\newpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/docker/docker.png}
+	\caption{Running windows server container}
+\end{figure}
+\clearpage
 
 \section{Domain Controller}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.medium or larger\\
-\textbf{Security Group Ports:}
+Instance Name: Domain Controller\\
+Instance Type: t3.medium or larger\\
+Security Group Ports:
 \begin{itemize}
-	\item 53 (DNS TCP/UDP)
-	\item 88 (Kerberos)
-	\item 135 (RPC)
-	\item 139, 445 (SMB)
-	\item 389, 636 (LDAP, LDAPS)
-	\item 3268, 3269 (Global Catalog)
-	\item 49152-65535 (Dynamic RPC)
+	\item tcp 80
+	\item tcp 3389 (RDP)
+	\item tcp 0-65535 (All tcp ports)
+	\item udp 0-65535 (all udp ports)
+	\item icmp -1 (all icmp)
 \end{itemize}
-\textbf{Storage:} Minimum 50GB SSD\\
-\textbf{Operating System:} Windows Server 2019/2022
+Storage: Minimum 50GB SSD\\
+Operating System: Windows Server 2019/2022
 
-\subsection{Installation Steps}
+\subsection{Installation}
 
-\begin{enumerate}
-	\item \textbf{Prepare the Server}
-	      \begin{itemize}
-		      \item Set a static IP address in Windows network settings
-		      \item Configure DNS to point to itself (127.0.0.1) and a secondary DNS
-		      \item Rename the server with a descriptive hostname
-		      \item Ensure the system is fully updated
-	      \end{itemize}
-
-	\item \textbf{Install Active Directory Domain Services}
-	      \begin{itemize}
-		      \item Open Server Manager
-		      \item Click ``Add roles and features''
-		      \item Select ``Active Directory Domain Services'' role
-		      \item Include management tools when prompted
-		      \item Complete the installation wizard
-	      \end{itemize}
-
-	\item \textbf{Promote to Domain Controller}
-	      \begin{itemize}
-		      \item Click the notification flag in Server Manager
-		      \item Select ``Promote this server to a domain controller''
-		      \item Choose ``Add a new forest'' for a new domain or ``Add a domain controller to an existing domain''
-		      \item Specify the root domain name (e.g., company.local)
-		      \item Set the Forest and Domain functional levels (Windows Server 2016 or higher recommended)
-		      \item Configure DNS and Global Catalog options (typically enabled by default)
-		      \item Set Directory Services Restore Mode (DSRM) password
-		      \item Review NetBIOS domain name
-		      \item Specify paths for AD database, log files, and SYSVOL
-		      \item Review settings and promote
-		      \item Server will restart automatically
-	      \end{itemize}
-
-	\item \textbf{Post-Installation Configuration}
-	      \begin{itemize}
-		      \item Verify DNS is functioning correctly
-		      \item Create Organizational Units (OUs) for logical organization
-		      \item Configure Group Policy Objects (GPOs) as needed
-		      \item Set up additional domain controllers for redundancy
-		      \item Configure Active Directory Sites and Services if multi-site
-		      \item Implement backup strategy for system state and Active Directory
-		      \item Configure time synchronization (PDC Emulator should sync with external source)
-		      \item Enable and configure Active Directory Recycle Bin for easier object recovery
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Installation Steps - PowerShell}
-
-\begin{enumerate}
-	\item \textbf{Set Static IP Address}
-	      \begin{lstlisting}[language=bash]
-# View current network adapters
-Get-NetAdapter
-
-# Set static IP (adjust values for your environment)
-New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.0.1.10 -PrefixLength 24 -DefaultGateway 10.0.1.1
-
-# Set DNS to localhost (127.0.0.1) and secondary
-Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 127.0.0.1,8.8.8.8
-\end{lstlisting}
-
-	\item \textbf{Rename Computer}
-	      \begin{lstlisting}[language=bash]
-# Rename the server
-Rename-Computer -NewName "DC01" -Restart
-\end{lstlisting}
-
-	\item \textbf{Install AD DS Role}
-	      \begin{lstlisting}[language=bash]
-# Install Active Directory Domain Services role with management tools
+\begin{lstlisting}[language=bash]
 Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
-
-# Verify installation
-Get-WindowsFeature | Where-Object {$_.Name -eq "AD-Domain-Services"}
+Install-ADDSForest -DomainName "example.local" -InstallDNS -SafeModeAdministratorPassword (ConvertTo-SecureString "Mypassword@2025" -AsPlainText -Force) -NoRebootOnCompletion -Force  
+# Get-Service adws,kdc,netlogon,dns
+Restart-Computer      
 \end{lstlisting}
 
-	\item \textbf{Promote to Domain Controller (New Forest)}
-	      \begin{lstlisting}[language=bash]
-# Import the AD DS Deployment module
-Import-Module ADDSDeployment
-
-# Create new forest and promote to DC
-Install-ADDSForest `
-    -DomainName "company.local" `
-    -DomainNetbiosName "COMPANY" `
-    -ForestMode "WinThreshold" `
-    -DomainMode "WinThreshold" `
-    -InstallDns:$true `
-    -CreateDnsDelegation:$false `
-    -DatabasePath "C:\Windows\NTDS" `
-    -LogPath "C:\Windows\NTDS" `
-    -SysvolPath "C:\Windows\SYSVOL" `
-    -NoRebootOnCompletion:$false `
-    -Force:$true
-\end{lstlisting}
-	      \textit{Note: You'll be prompted for the SafeModeAdministratorPassword (DSRM password)}
-
-	\item \textbf{Promote Additional Domain Controller (Existing Domain)}
-	      \begin{lstlisting}[language=bash]
-# Add DC to existing domain
-Install-ADDSDomainController `
-    -DomainName "company.local" `
-    -InstallDns:$true `
-    -Credential (Get-Credential "COMPANY\Administrator") `
-    -DatabasePath "C:\Windows\NTDS" `
-    -LogPath "C:\Windows\NTDS" `
-    -SysvolPath "C:\Windows\SYSVOL" `
-    -NoRebootOnCompletion:$false `
-    -Force:$true
-\end{lstlisting}
-
-	\item \textbf{Post-Installation Verification}
-	      \begin{lstlisting}[language=bash]
-# Verify AD Web Services is running
-Get-Service ADWS
-
-# Check domain controller functionality
-Get-ADDomainController
-
-# Test AD replication (if multiple DCs)
-repadmin /replsummary
-
-# Verify DNS zones
-Get-DnsServerZone
-
-# Check SYSVOL replication
-dfsrdiag replicationstate /all
-
-# Verify FSMO roles
-Get-ADDomain | Select-Object InfrastructureMaster, RIDMaster, PDCEmulator
-Get-ADForest | Select-Object DomainNamingMaster, SchemaMaster
-\end{lstlisting}
-
-	\item \textbf{Create Organizational Units}
-	      \begin{lstlisting}[language=bash]
-# Create OUs for organization
-New-ADOrganizationalUnit -Name "Users" -Path "DC=company,DC=local"
-New-ADOrganizationalUnit -Name "Computers" -Path "DC=company,DC=local"
-New-ADOrganizationalUnit -Name "Groups" -Path "DC=company,DC=local"
-New-ADOrganizationalUnit -Name "Servers" -Path "DC=company,DC=local"
-\end{lstlisting}
-
-	\item \textbf{Configure Active Directory Recycle Bin}
-	      \begin{lstlisting}[language=bash]
-# Enable AD Recycle Bin (cannot be reversed)
-Enable-ADOptionalFeature -Identity 'Recycle Bin Feature' `
-    -Scope ForestOrConfigurationSet `
-    -Target 'company.local' `
-    -Confirm:$false
-\end{lstlisting}
-
-	\item \textbf{Configure Time Synchronization (PDC Emulator)}
-	      \begin{lstlisting}[language=bash]
-# Configure external time source on PDC Emulator
-w32tm /config /manualpeerlist:"time.windows.com,0x8" /syncfromflags:manual /reliable:yes /update
-
-# Restart Windows Time service
-Restart-Service W32Time
-
-# Force sync and check status
-w32tm /resync
-w32tm /query /status
-\end{lstlisting}
-
-	\item \textbf{Set Password Policy}
-	      \begin{lstlisting}[language=bash]
-# Configure default domain password policy
-Set-ADDefaultDomainPasswordPolicy -Identity "company.local" `
-    -ComplexityEnabled $true `
-    -LockoutDuration "00:30:00" `
-    -LockoutThreshold 5 `
-    -MaxPasswordAge "90.00:00:00" `
-    -MinPasswordAge "1.00:00:00" `
-    -MinPasswordLength 12 `
-    -PasswordHistoryCount 24
-\end{lstlisting}
-\end{enumerate}
-
-\subsection{Security Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Implement least privilege access for domain administrators
-	\item Use separate administrative accounts for daily tasks vs. domain administration
-	\item Enable and monitor security logs
-	\item Regularly patch and update the domain controller
-	\item Consider implementing tiered administrative model
-	\item Use strong password policies and account lockout policies
-	\item Utilize Advanced Threat Protection
+\item connect to File Server or other windows server
+\item change dns server address to <private ip of domain controller>
+\item join the domain 'example.local'
 \end{itemize}
 
 \end{document}
