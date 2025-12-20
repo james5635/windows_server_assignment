@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.31)  19 DEC 2025 23:17
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.7.31)  20 DEC 2025 11:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -612,15 +612,17 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
 [1
 
-])
+]
+
+[2])
 \tf@toc=\write4
 \openout4 = `document_windows.toc'.
 
 
 
-[2]
+[3]
 
-[3] (/home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+[4] (/home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/09/23 1.10c listings language file
 )
 (/home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
@@ -630,49 +632,49 @@ File: static/file_server/demo.png Graphic file (type bmp)
 <static/file_server/demo.png>
 
 
-[4]
+[5]
 File: static/proxy_server/allow_youtube.png Graphic file (type bmp)
 <static/proxy_server/allow_youtube.png>
 
 
-[5]
+[6]
 File: static/proxy_server/block_facebook.png Graphic file (type bmp)
 <static/proxy_server/block_facebook.png>
 
 
-[6
+[7
 
 ]
 
-[7
+[8
 
 ]
 File: static/dns_server/connect_dns_server.png Graphic file (type bmp)
 <static/dns_server/connect_dns_server.png>
 
 
-[8
-
-]
-
 [9
 
 ]
 
-[10]
+[10
+
+]
+
+[11]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 340.
 File: static/vpn_server/connect_vpn_server.png Graphic file (type bmp)
 <static/vpn_server/connect_vpn_server.png>
 
 
-[11]
+[12]
 File: static/terminal_server/connect_terminal_server.png Graphic file (type bmp
 )
 <static/terminal_server/connect_terminal_server.png>
 
 
-[12]
+[13]
 Underfull \hbox (badness 10000) in paragraph at lines 393--396
 
  []
@@ -681,51 +683,51 @@ File: static/web_server/connect_web_server.png Graphic file (type bmp)
 <static/web_server/connect_web_server.png>
 
 
-[13]
-
 [14]
 
 [15]
+
+[16]
 File: static/mail_server/connect_mail_server.png Graphic file (type bmp)
 <static/mail_server/connect_mail_server.png>
 
-
-[16
-
-]
 
 [17
 
 ]
 
-[18]
+[18
+
+]
+
+[19]
 File: static/database_server/postgresql.png Graphic file (type bmp)
 <static/database_server/postgresql.png>
 File: static/database_server/sql_server.png Graphic file (type bmp)
 <static/database_server/sql_server.png>
 
 
-[19]
+[20]
 File: static/database_server/mongodb.png Graphic file (type bmp)
 <static/database_server/mongodb.png>
 
 
-[20
+[21
 
 ]
 
-[21
+[22
 
 ]
 File: static/backup_server/backup_server.png Graphic file (type bmp)
 <static/backup_server/backup_server.png>
 
 
-[22
+[23
 
 ]
 
-[23
+[24
 
 ]
 File: static/load_balancing/server_1.png Graphic file (type bmp)
@@ -734,7 +736,7 @@ File: static/load_balancing/server_2.png Graphic file (type bmp)
 <static/load_balancing/server_2.png>
 
 
-[24
+[25
 
 ]
 Overfull \hbox (9.67876pt too wide) in paragraph at lines 803--804
@@ -744,48 +746,68 @@ Overfull \hbox (9.67876pt too wide) in paragraph at lines 803--804
 
 
 
-[25]
-
 [26]
+
+[27]
 Underfull \hbox (badness 10000) in paragraph at lines 822--825
 
  []
 
 
 
-[27]
-
 [28]
+
+[29]
 File: static/ftp_server/ftp_server.png Graphic file (type bmp)
 <static/ftp_server/ftp_server.png>
 
 
-[29]
+[30]
 File: static/docker/docker.png Graphic file (type bmp)
 <static/docker/docker.png>
 
 
-[30
+[31
 
 ]
 
-[31
+[32
 
-] (./document_windows.aux)
+]
+File: static/domain_controller/domain_controller.png Graphic file (type bmp)
+<static/domain_controller/domain_controller.png>
+
+
+[33
+
+] (/home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2024/09/23 1.10c listings language file
+)
+
+[34
+
+]
+
+[35]
+File: static/devspeedllm/devspeedllm.png Graphic file (type bmp)
+<static/devspeedllm/devspeedllm.png>
+
+
+[36] (./document_windows.aux)
  ***********
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-07-19>
  ***********
 Package rerunfilecheck Info: File `document_windows.out' has not changed.
-(rerunfilecheck)             Checksum: E198436F58BB05AE56F24E9EB851EE4B;8366.
+(rerunfilecheck)             Checksum: B590D8B153459C9657ED54E73FB7777F;8816.
  ) 
 Here is how much of TeX's memory you used:
- 16521 strings out of 469991
- 318676 string characters out of 5479681
- 1378815 words of memory out of 5000000
- 44664 multiletter control sequences out of 15000+600000
+ 16741 strings out of 469991
+ 322143 string characters out of 5479681
+ 1564631 words of memory out of 5000000
+ 44878 multiletter control sequences out of 15000+600000
  631101 words of font info for 86 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 73i,6n,99p,395b,1783s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 73i,6n,99p,395b,1900s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on document_windows.pdf (31 pages).
+Output written on document_windows.xdv (36 pages, 1043164 bytes).

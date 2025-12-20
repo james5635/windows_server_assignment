@@ -159,6 +159,7 @@ INPUT document_windows.toc
 INPUT /home/jame/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi10.tfm
 INPUT /home/jame/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmsy10.tfm
 INPUT /home/jame/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmr10.tfm
+OUTPUT document_windows.xdv
 OUTPUT document_windows.toc
 INPUT /home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
@@ -214,6 +215,15 @@ INPUT ./static/ftp_server/ftp_server.png
 INPUT ./static/docker/docker.png
 INPUT ./static/docker/docker.png
 INPUT ./static/docker/docker.png
+INPUT ./static/domain_controller/domain_controller.png
+INPUT ./static/domain_controller/domain_controller.png
+INPUT ./static/domain_controller/domain_controller.png
+INPUT /home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /home/jame/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT ./static/devspeedllm/devspeedllm.png
+INPUT ./static/devspeedllm/devspeedllm.png
+INPUT ./static/devspeedllm/devspeedllm.png
 INPUT document_windows.aux
 INPUT ./document_windows.out
 INPUT ./document_windows.out

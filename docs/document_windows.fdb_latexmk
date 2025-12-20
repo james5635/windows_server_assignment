@@ -1,6 +1,11 @@
 # Fdb version 4
-["pdflatex"] 1766161036.03055 "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" "document_windows.pdf" "document_windows" 1766161044.67628 0
-  "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" 1766161027.92834 35691 dc201e7bea6a6e5d21a533f9cd8e7ae8 ""
+["xdvipdfmx"] 1766203208.96428 "document_windows.xdv" "document_windows.pdf" "document_windows" 1766203216.99221 0
+  "document_windows.xdv" 1766203208.75925 1043164 7fddd4a70b797df738d2ea62fd8405b4 "xelatex"
+  (generated)
+  "document_windows.pdf"
+  (rewritten before read)
+["xelatex"] 1766203205.18295 "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" "document_windows.xdv" "document_windows" 1766203216.9879 0
+  "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" 1766203203.06247 41961 08480d3ecb411627ee460c1993106fb0 ""
   "/home/jame/texlive/2025/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/home/jame/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi10.tfm" 1136768653 1528 abec98dbc43e172678c11b3b9031252a ""
   "/home/jame/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm" 1136768653 1524 4414a8315f39513458b80dfc63bff03a ""
@@ -75,16 +80,18 @@
   "/home/jame/texlive/2025/texmf-dist/web2c/texmf.cnf" 1749313668 42213 4e2ca030e8e2640502016e9e45868dcb ""
   "/home/jame/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1753977189 5366711 fca1f8c28dc6816b6a70a567ea59c6d0 ""
   "/home/jame/texlive/2025/texmf.cnf" 1753977162.24481 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
-  "document_windows.aux" 1766161043.87844 10993 31eceac55b06d0e2376abecb9de83a3f "pdflatex"
-  "document_windows.out" 1766161043.88177 8366 e198436f58bb05ae56f24e9eb851ee4b "pdflatex"
-  "document_windows.tex" 1766161027.92834 35691 dc201e7bea6a6e5d21a533f9cd8e7ae8 ""
-  "document_windows.toc" 1766161043.88177 5323 d36101958c62c039f14450463b2beddc "pdflatex"
+  "document_windows.aux" 1766203208.75258 11769 fd3bdb1fbc54bad5d6402af078762690 "xelatex"
+  "document_windows.out" 1766203208.75925 8816 b590d8b153459c9657ed54e73fb7777f "xelatex"
+  "document_windows.tex" 1766203203.06247 41961 08480d3ecb411627ee460c1993106fb0 ""
+  "document_windows.toc" 1766203208.75925 5638 ddc0fbdccd6d052202505a9f255f2aed "xelatex"
   "static/backup_server/backup_server.png" 1766155724.24475 203567 2200375cede960472d73f955067d48d6 ""
   "static/database_server/mongodb.png" 1766151643.04913 225945 68f1e5999a365f03bd2159fae02731f6 ""
   "static/database_server/postgresql.png" 1766151718.78462 209420 8d83e0afb1f01b675c0a6c89112d9668 ""
   "static/database_server/sql_server.png" 1766151682.34359 202608 12e6630fe07dfb425ca381220ba3a3e4 ""
+  "static/devspeedllm/devspeedllm.png" 1766202966.25088 339331 07622233530bfc3a3f7abafac9fc2268 ""
   "static/dns_server/connect_dns_server.png" 1766145661.94125 330161 806b9a5e220545450d157e8cfdd60759 ""
   "static/docker/docker.png" 1766160128.66081 270669 3be65a0ab14657c4a7db2dca0e8cacdf ""
+  "static/domain_controller/domain_controller.png" 1766200283.14362 301245 72e90f3f4598189f079a9fea88a621da ""
   "static/file_server/demo.png" 1766133981.419 235462 0041cadec14ac4a99afa7189d753bfdc ""
   "static/ftp_server/ftp_server.png" 1766158528.1171 293483 0823991b02a1a6387e7a127f4794966a ""
   "static/load_balancing/server_1.png" 1766157374.59832 214109 a0f4825887d9af86923635666ec405b6 ""
@@ -99,6 +106,6 @@
   "document_windows.aux"
   "document_windows.log"
   "document_windows.out"
-  "document_windows.pdf"
   "document_windows.toc"
+  "document_windows.xdv"
   (rewritten before read)

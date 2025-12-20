@@ -991,13 +991,13 @@ Security Group Ports:
 Storage: Minimum 50GB SSD\\
 Operating System: Windows Server 2019/2022
 
-\subsection{Installation}
+\subsection{Implementation}
 
 \begin{lstlisting}[language=bash]
 Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
-Install-ADDSForest -DomainName "example.local" -InstallDNS -SafeModeAdministratorPassword (ConvertTo-SecureString "Mypassword@2025" -AsPlainText -Force) -NoRebootOnCompletion -Force  
+Install-ADDSForest -DomainName "example.local" -InstallDNS -SafeModeAdministratorPassword (ConvertTo-SecureString "Mypassword@2025" -AsPlainText -Force) -NoRebootOnCompletion -Force
 # Get-Service adws,kdc,netlogon,dns
-Restart-Computer      
+Restart-Computer
 \end{lstlisting}
 
 \subsection{Usage}
@@ -1006,5 +1006,150 @@ Restart-Computer
 \item change dns server address to <private ip of domain controller>
 \item join the domain 'example.local'
 \end{itemize}
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/domain_controller/domain_controller.png}
+	\caption{Successfully join the domain}
+\end{figure}
+\clearpage
+
+\section{DevSpeedLLM}
+
+\subsection{Configuration}
+GPU: dual NVIDIA T4 GPUs\\
+OS: Linux
+\subsection{Implementation}
+\begin{lstlisting}[language=python]
+from datasets import load_dataset
+
+# train_dataset = load_dataset("trl-lib/Capybara", split="train")
+def make_chatml(example):
+    return {
+        "messages": [ [ {"role": "user", "content": "Summarize the following text:\n\n"  + content },
+                             {"role": "assistant", "content":  summary }  ]  +
+                             [x for qa in qas for x in (
+                             {"role": "user", "content": qa["question"] if qa['question'] != None else ""}, # There are 2 question=None in the dataset
+                             {"role": "assistant", "content": qa["answer"]},
+                             )] for content, summary, qas in zip(example['content'], example['summary'], example["QAs"])
+        ]
+    }
+dataset = load_dataset("james56352025/devspeedllm-datasets", "rupp_enhanced", split = "train")
+train_dataset = dataset.map(make_chatml, batched=True, remove_columns=['summary', 'qa_pairs', 'content', 'QAs'])
+
+
+from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+import torch
+
+# model_id = "Qwen/Qwen2.5-1.5B-Instruct"
+# model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+# model_id = "google/gemma-3-270m-it"
+model_id = "meta-llama/Llama-3.2-3B-Instruct"
+output_dir = "lora-out"
+
+four_bit = BitsAndBytesConfig(
+        load_in_4bit=True,                        # Load the model in 4-bit precision to save memory
+        bnb_4bit_compute_dtype=torch.float16,     # Data type used for internal computations in quantization
+        bnb_4bit_use_double_quant=True,           # Use double quantization to improve accuracy
+        bnb_4bit_quant_type="nf4"                 # Type of quantization. "nf4" is recommended for recent LLMs
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    attn_implementation="sdpa",                   # Change to Flash Attention if GPU has support
+    dtype=torch.float16,                          # Change to bfloat16 if GPU has support
+    use_cache=True,                               # Whether to cache attention outputs to speed up inference
+    # quantization_config=four_bit,
+)
+
+from peft import LoraConfig
+
+# You may need to update `target_modules` depending on the architecture of your chosen model.
+# For example, different LLMs might have different attention/projection layer names.
+peft_config = LoraConfig(
+    r=32,
+    lora_alpha=32,
+    target_modules = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj",],
+)
+
+import shutil, os, glob
+from transformers.trainer_callback import TrainerCallback
+
+class ZipCallback(TrainerCallback):
+    # Required empty methods
+    def on_init_end(self, args, state, control, **kwargs):
+        pass
+    def on_train_begin(self, args, state, control, **kwargs):
+        pass
+    def on_train_end(self, args, state, control, **kwargs):
+        pass
+    def on_epoch_end(self, args, state, control, **kwargs):
+        pass
+    # THE ONE WE USE
+    def on_save(self, args, state, control, **kwargs):
+        # Find latest checkpoint
+        # ckpts = sorted(glob.glob(os.path.join(args.output_dir, "checkpoint-*")))
+        ckpts = glob.glob(os.path.join(args.output_dir, "checkpoint-*"))
+        if not ckpts:
+            return control
+        # latest = ckpts[-1]
+        latest = max(ckpts, key=lambda x: int(x.split("-")[-1]))
+        zip_path = os.path.join(os.path.dirname(args.output_dir), os.path.basename(latest) + ".zip")
+        if os.path.exists(zip_path):
+            print("\n" + f"Already zipped: {zip_path}")
+            return control
+        shutil.make_archive(os.path.splitext(zip_path)[0], "zip", latest)
+        print()
+        print(f"Zipped: {zip_path}")
+        return control
+
+
+from trl import SFTConfig, SFTTrainer
+
+training_args = SFTConfig(
+    # Training schedule / optimization
+    per_device_train_batch_size = 1,      # Batch size per GPU
+    gradient_accumulation_steps = 4,      # Gradients are accumulated over multiple steps → effective batch size = 2 * 8 = 16
+    warmup_steps = 5,
+    num_train_epochs = 5,               # Number of full dataset passes. For shorter training, use `max_steps` instead (this case)
+    # max_steps = 2,
+    learning_rate = 2e-4,                 # Learning rate for the optimizer
+    optim = "paged_adamw_8bit",           # Optimizer
+    # Logging / reporting
+    logging_steps=1,                      # Log training metrics every N steps
+    report_to="trackio",                  # Experiment tracking tool
+    trackio_space_id=output_dir,          # HF Space where the experiment tracking will be saved
+    output_dir=output_dir,                # Where to save model checkpoints and logs
+    # max_length=1024,                      # Maximum input sequence length
+    use_liger_kernel=True,                # Enable Liger kernel optimizations for faster training
+    activation_offloading=True,           # Offload activations to CPU to reduce GPU memory usage
+    gradient_checkpointing=True,          # Save memory by re-computing activations during backpropagation
+    # Hub integration
+    push_to_hub=False,                    # Automatically push the trained model to the Hugging Face Hub
+                                          # The model will be saved under your Hub account in the repository named `output_dir`
+    gradient_checkpointing_kwargs={"use_reentrant": False}, # To prevent warning message
+)
+
+trainer = SFTTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    peft_config=peft_config,
+    callbacks = [ZipCallback()],
+)
+
+trainer_stats = trainer.train()
+trainer.save_model(output_dir)
+\end{lstlisting}
+\subsection{Usage}
+\begin{itemize}
+\item ask "tell me about RUPP"
+\item ask "list academic staffs of computer science department at RUPP with name"
+\item ask "teach me flutter and give example"
+\end{itemize}
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/devspeedllm/devspeedllm.png}
+	\caption{Chatting with DevSpeedLLM}
+\end{figure}
 
 \end{document}
