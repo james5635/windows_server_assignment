@@ -24,7 +24,10 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage[most]{tcolorbox}
 
+\newfontfamily\emoji{Noto Color Emoji}[Renderer=HarfBuzz]
+   
 % Hyperref must be loaded last
 \usepackage[hidelinks]{hyperref}
 \hypersetup{
@@ -241,48 +244,55 @@ New-NetFirewallRule -DisplayName "Allow DNS UDP 53" -Direction Inbound -Protocol
 \section{DHCP Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.small\\
-\textbf{Note:} AWS VPC provides DHCP by default; custom DHCP server is optional.
+Instance Name: DHCP Server\\
+Instance Type: t3.medium\\ 
+Security Group Ports: udp 67, udp 68, tcp 3389 (RDP)
 
-\subsection{Implementation Steps}
+\begin{tcolorbox}[title=Note]
+AWS VPC provides DHCP by default; custom DHCP server is optional.\\
+Is the dhcp server in ec2 instance works in AWS, becuase ec2 instance already used VPC DHCP?\\
+No — a normal DHCP server inside an EC2 instance does NOT work for assigning IPs to other EC2 instances.\\
+Because:\\
+{\emoji 👉} AWS VPC already provides DHCP\\
+{\emoji 👉} DHCP broadcast is blocked in AWS\\
+\end{tcolorbox}
+ 
+\subsection{Implementation}
+\begin{lstlisting}[language=bash]
+# Install DHCP Role
+Install-WindowsFeature DHCP -IncludeManagementTools
 
-\begin{enumerate}
-	\item \textbf{Launch Windows Server Instance}
+# If in a domain (skip if standalone)
+# Add-DhcpServerInDC -DnsName "dhcpserver.example.internal" -IpAddress "10.0.1.10"
 
-	\item \textbf{Install DHCP Server Role}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name DHCP -IncludeManagementTools
-Add-DhcpServerInDC -DnsName "dhcp.yourdomain.local"
-\end{lstlisting}
+# Create scope
+Add-DhcpServerv4Scope `
+    -Name "MainScope" `
+    -StartRange 10.0.1.50 `
+    -EndRange 10.0.1.150 `
+    -SubnetMask 255.255.255.0 `
+    -State Active
 
-	\item \textbf{Configure DHCP Scope}
-	      \begin{lstlisting}[language=bash]
-Add-DhcpServerv4Scope -Name "Internal Network" -StartRange 10.0.1.100 -EndRange 10.0.1.200 -SubnetMask 255.255.255.0
-
+# Configure DHCP options
 Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -Router 10.0.1.1
 Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -DnsServer 10.0.1.10
+Set-DhcpServerv4OptionValue -ScopeId 10.0.1.0 -DnsDomain "example.internal"
+
+New-NetFirewallRule -DisplayName "Allow DHCP UDP 67" -Direction Inbound -Protocol UDP -LocalPort 67 -Action Allow
+New-NetFirewallRule -DisplayName "Allow DHCP UDP 68" -Direction Inbound -Protocol UDP -LocalPort 68 -Action Allow
 \end{lstlisting}
 
-	\item \textbf{Configure Reservations}
-	      \begin{lstlisting}[language=bash]
-Add-DhcpServerv4Reservation -ScopeId 10.0.1.0 -IPAddress 10.0.1.50 -ClientId "00-11-22-33-44-55" -Description "Print Server"
-\end{lstlisting}
-
-	\item \textbf{Authorize DHCP Server}
-	      \begin{lstlisting}[language=bash]
-Add-DhcpServerInDC -DnsName "dhcp.yourdomain.local" -IPAddress 10.0.1.10
-\end{lstlisting}
-\end{enumerate}
-
-\subsection{Best Practices}
+\subsection{Usage}
 \begin{itemize}
-	\item Consider using AWS-provided DHCP for simplicity
-	\item Deploy DHCP failover for redundancy
-	\item Use DHCP policies for different device types
-	\item Monitor DHCP lease utilization
+\item AWS VPC DHCP is used in EC2 instance
 \end{itemize}
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/dhcp_server/dhcp_server.png}
+	\caption{A dhcp server instance}
+\end{figure}
 
-\newpage
+\clearpage
 
 \section{VPN Server}
 
@@ -719,16 +729,16 @@ Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_ass
 
 \subsection{Usage}
 \begin{itemize}
-\item manually configure load balancer (application load balancer)
-\item name: devspeedlb
-\item select all availability Zones and subnets
-\item create target group (name: web)
-\item
-    \begin{itemize}
-        \item include WebServerMailServer \& Docker
-    \end{itemize}
-\item choose 'web' as target group
-\item add tcp (port 80) to inbound rule of the load balancer's security group
+	\item manually configure load balancer (application load balancer)
+	\item name: devspeedlb
+	\item select all availability Zones and subnets
+	\item create target group (name: web)
+	\item
+	      \begin{itemize}
+		      \item include WebServerMailServer \& Docker
+	      \end{itemize}
+	\item choose 'web' as target group
+	\item add tcp (port 80) to inbound rule of the load balancer's security group
 \end{itemize}
 \clearpage
 \begin{figure}[htbp]
@@ -935,9 +945,9 @@ echo hello > "C:\inetpub\ftproot\hello.txt"
 
 \subsection{Usage}
 \begin{itemize}
-\item use filezilla (port 21)
-\item username: jame
-\item password: Mypassword@2025
+	\item use filezilla (port 21)
+	\item username: jame
+	\item password: Mypassword@2025
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -963,10 +973,10 @@ Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/
 
 \subsection{Usage}
 \begin{itemize}
-\item connect to the Docker ec2 instance
-\item docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
-\item docker pull mcr.microsoft.com/windows/servercore:ltsc2022 (optional)
-\item docker run -it <image>
+	\item connect to the Docker ec2 instance
+	\item docker pull mcr.microsoft.com/windows/nanoserver:ltsc2022
+	\item docker pull mcr.microsoft.com/windows/servercore:ltsc2022 (optional)
+	\item docker run -it <image>
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -1002,9 +1012,9 @@ Restart-Computer
 
 \subsection{Usage}
 \begin{itemize}
-\item connect to File Server or other windows server
-\item change dns server address to <private ip of domain controller>
-\item join the domain 'example.local'
+	\item connect to File Server or other windows server
+	\item change dns server address to <private ip of domain controller>
+	\item join the domain 'example.local'
 \end{itemize}
 \clearpage
 \begin{figure}[htbp]
@@ -1142,9 +1152,9 @@ trainer.save_model(output_dir)
 \end{lstlisting}
 \subsection{Usage}
 \begin{itemize}
-\item ask "tell me about RUPP"
-\item ask "list academic staffs of computer science department at RUPP with name"
-\item ask "teach me flutter and give example"
+	\item ask "tell me about RUPP"
+	\item ask "list academic staffs of computer science department at RUPP with name"
+	\item ask "teach me flutter and give example"
 \end{itemize}
 
 \begin{figure}[htbp]
