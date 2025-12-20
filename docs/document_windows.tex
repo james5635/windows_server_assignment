@@ -25,6 +25,7 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage[most]{tcolorbox}
+\usepackage{svg}
 
 \newfontfamily\emoji{Noto Color Emoji}[Renderer=HarfBuzz]
    
@@ -245,18 +246,18 @@ New-NetFirewallRule -DisplayName "Allow DNS UDP 53" -Direction Inbound -Protocol
 
 \subsection{AWS Configuration}
 Instance Name: DHCP Server\\
-Instance Type: t3.medium\\ 
+Instance Type: t3.medium\\
 Security Group Ports: udp 67, udp 68, tcp 3389 (RDP)
 
 \begin{tcolorbox}[title=Note]
-AWS VPC provides DHCP by default; custom DHCP server is optional.\\
-Is the dhcp server in ec2 instance works in AWS, becuase ec2 instance already used VPC DHCP?\\
-No — a normal DHCP server inside an EC2 instance does NOT work for assigning IPs to other EC2 instances.\\
-Because:\\
-{\emoji 👉} AWS VPC already provides DHCP\\
-{\emoji 👉} DHCP broadcast is blocked in AWS\\
+	AWS VPC provides DHCP by default; custom DHCP server is optional.\\
+	Is the dhcp server in ec2 instance works in AWS, becuase ec2 instance already used VPC DHCP?\\
+	No — a normal DHCP server inside an EC2 instance does NOT work for assigning IPs to other EC2 instances.\\
+	Because:\\
+	{\emoji 👉} AWS VPC already provides DHCP\\
+	{\emoji 👉} DHCP broadcast is blocked in AWS\\
 \end{tcolorbox}
- 
+
 \subsection{Implementation}
 \begin{lstlisting}[language=bash]
 # Install DHCP Role
@@ -284,7 +285,7 @@ New-NetFirewallRule -DisplayName "Allow DHCP UDP 68" -Direction Inbound -Protoco
 
 \subsection{Usage}
 \begin{itemize}
-\item AWS VPC DHCP is used in EC2 instance
+	\item AWS VPC DHCP is used in EC2 instance
 \end{itemize}
 \clearpage
 \begin{figure}[htbp]
@@ -754,77 +755,100 @@ Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_ass
 \section{Failover Cluster}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} r5.xlarge or larger\\
-\textbf{Storage:} Shared storage using FSx for Windows or S3\\
-\textbf{Network:} Placement groups for low latency\\
-\textbf{Security Group:} Allow cluster communication ports
-
-\subsection{Implementation Steps}
-
-\begin{enumerate}
-	\item \textbf{Launch Multiple Windows Server Instances}
-	      \begin{itemize}
-		      \item Deploy in same VPC, different availability zones
-		      \item Use placement group for low latency
-	      \end{itemize}
-
-	\item \textbf{Install Failover Clustering Feature}
-	      \begin{lstlisting}[language=bash]
-Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools
-\end{lstlisting}
-
-	\item \textbf{Configure Shared Storage}
-	      \begin{itemize}
-		      \item \textbf{Option A: Amazon FSx for Windows File Server}\\
-		            Create FSx file system; Mount on all cluster nodes.
-		      \item \textbf{Option B: EBS Multi-Attach (io2 only)}\\
-		            Attach same EBS volume to multiple instances; Initialize as cluster shared volume.
-	      \end{itemize}
-
-	\item \textbf{Create Failover Cluster}
-	      \begin{lstlisting}[language=bash]
-# Validate cluster configuration
-Test-Cluster -Node "Node1", "Node2"
-
-# Create cluster
-New-Cluster -Name "MyCluster" -Node "Node1", "Node2" -StaticAddress "10.0.1.100" -NoStorage
-\end{lstlisting}
-
-	\item \textbf{Configure Cluster Quorum}
-	      \begin{lstlisting}[language=bash]
-Set-ClusterQuorum -NodeAndFileShareMajority "\\FSx\Witness"
-\end{lstlisting}
-
-	\item \textbf{Add Clustered Role}
-	      \begin{lstlisting}[language=bash]
-# For SQL Server
-Add-ClusterServerRole -Name "SQL-Cluster" -Storage "Cluster Disk 1"
-\end{lstlisting}
-
-	\item \textbf{Configure Secondary Private IP}
-	      \begin{itemize}
-		      \item Assign secondary private IP to ENI
-		      \item Configure in cluster as virtual IP
-	      \end{itemize}
-\end{enumerate}
-
-\subsection{Common Cluster Types in AWS}
-\begin{description}
-	\item[SQL Server Failover Cluster] Use FSx for shared storage; Configure SQL Server on cluster nodes; Set up availability group for database replication.
-	\item[File Server Cluster] Use FSx or S3 for storage; Configure highly available file shares.
-\end{description}
-
-\subsection{Best Practices}
+Instance Name: Failover Cluster\\
+Instance Type: t3.medium or larger\\
+Storage: Shared storage using FSx for Windows or S3\\
+Network: Placement groups for low latency\\
+Security Group:
 \begin{itemize}
-	\item Use Amazon FSx for Windows File Server for shared storage
-	\item Deploy cluster nodes in different availability zones
-	\item Use Elastic IP or Network Load Balancer for client access
-	\item Monitor cluster health with CloudWatch
-	\item Regular testing of failover scenarios
-	\item Consider Amazon RDS Multi-AZ for database clustering
+	\item Allow cluster communication ports
+	\item tcp 3389 (RDP)
 \end{itemize}
 
-\newpage
+\subsection{Implementation}
+
+\subsubsection{EVERY NODE}
+\begin{lstlisting}[language=bash]
+# ================================
+# Script 1: Run on EVERY NODE
+# ================================
+Write-Host "Installing Failover Clustering feature..." -ForegroundColor Cyan
+Install-WindowsFeature Failover-Clustering -IncludeManagementTools -Restart
+Write-Host "Installing File Server role (optional)..." -ForegroundColor Cyan
+Install-WindowsFeature FS-Fileserver
+\end{lstlisting}
+\subsubsection{ONE NODE ONLY}
+\begin{lstlisting}[language=bash]
+# ================================
+# Script 2: Run on ONE NODE ONLY
+# ================================
+          
+# ---- CONFIGURATION ----
+$ClusterName  = "MyCluster"
+$ClusterNodes = @("Node1", "Node2")
+$ClusterIP    = "192.168.1.50"
+          
+# ---- 1. Validate the cluster ----
+Write-Host "Validating cluster configuration..." -ForegroundColor Cyan
+Test-Cluster -Node $ClusterNodes -Verbose
+          
+Write-Host "Validation complete." -ForegroundColor Green
+          
+# ---- 2. Create the cluster ----
+Write-Host "Creating cluster..." -ForegroundColor Cyan
+New-Cluster `
+    -Name $ClusterName `
+    -Node $ClusterNodes `
+    -StaticAddress $ClusterIP `
+    -NoStorage `
+    -Verbose
+          
+# ---- 3. Verify cluster ----
+Get-Cluster
+Get-ClusterNode
+          
+# ---- 4. Configure cluster networks ----
+Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
+Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1
+          
+# ---- 5. Add disks & enable CSV ----
+Write-Host "Checking for available disks..." -ForegroundColor Cyan
+$AvailableDisks = Get-ClusterAvailableDisk
+          
+if ($AvailableDisks) {
+    Write-Host "Adding disks to Cluster Shared Volumes..." -ForegroundColor Cyan
+    $AvailableDisks | Add-ClusterDisk
+    $AvailableDisks | Add-ClusterSharedVolume
+} else {
+    Write-Host "No available disks found. Skipping CSV." -ForegroundColor Yellow
+}
+          
+# ---- 6. Configure Quorum ----
+Write-Host "Configuring quorum (Node Majority)..." -ForegroundColor Cyan
+Set-ClusterQuorum -NodeMajority
+          
+# ---- DONE ----
+Write-Host "`n====================================="
+Write-Host "  Failover Cluster Creation Complete!"
+Write-Host "  Cluster Name: $ClusterName"
+Write-Host "  Nodes: $($ClusterNodes -join ', ')"
+Write-Host "  IP: $ClusterIP"
+Write-Host "=====================================" -ForegroundColor Green
+          
+\end{lstlisting}
+\subsection{Usage}
+\begin{itemize}
+	\item there are 3 server
+	\item 1 server for domain controller
+	\item 2 other server join the domain and work as a cluster
+\end{itemize}
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/failover_cluster/Failover Cluster.drawio.pdf}
+	\caption{A cluster having two nodes}
+\end{figure}
+
+\clearpage
 
 \section{FTP Server}
 

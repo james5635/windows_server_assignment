@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.21.0 (TeX Live 2025/nixos.org)  (format=lualatex 1980.1.1)  20 DEC 2025 13:20
+This is LuaHBTeX, Version 1.21.0 (TeX Live 2025/nixos.org)  (format=lualatex 1980.1.1)  20 DEC 2025 14:41
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/workspaces/windows_server_assignment/docs/document_windows.tex
@@ -784,7 +784,39 @@ File: tikzlibraryfadings.code.tex 2023-01-15 v3.1.10 (3.1.10)
 File: pgflibraryfadings.code.tex 2023-01-15 v3.1.10 (3.1.10)
 ))) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/tcolorbox/tcbposter.code.tex
 Library (tcolorbox): 'tcbposter.code.tex' version '6.6.0'
-))
+)) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/svg/svg.sty
+Package: svg 2020/11/26 v2.02k (include SVG pictures)
+ (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrbase.sty
+Package: scrbase 2025/06/04 v3.45 KOMA-Script package (KOMA-Script-independent basics and keyval usage)
+ (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrlfile.sty
+Package: scrlfile 2025/06/04 v3.45 KOMA-Script package (file load hooks)
+ (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrlfile-hook.sty
+Package: scrlfile-hook 2025/06/04 v3.45 KOMA-Script package (using LaTeX hooks)
+ (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrlogo.sty
+Package: scrlogo 2025/06/04 v3.45 KOMA-Script package (logo)
+)))
+Applying: [2021/05/01] Usage of raw or classic option list on input line 254.
+Already applied: [0000/00/00] Usage of raw or classic option list on input line 370.
+) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+\pdftexcmds@toks=\toks42
+) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/tools/shellesc.sty
+Package: shellesc 2023/07/08 v1.0d unified shell escape interface for LaTeX
+Package shellesc Info: Restricted shell escape enabled on input line 77.
+)
+\c@svg@param@lastpage=\count356
+\svg@box=\box83
+\c@svg@param@currpage=\count357
+) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/transparent/transparent.sty
+Package: transparent 2025-06-23 v1.6 Transparency with color stacks
+ (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/transparent/transparent-nometadata.sty
+Package: transparent-nometadata 2025-06-23 v1.6 Transparency via pdfTeX's color stack (HO)
+ (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)))
 
 Package fontspec Info: 
 (fontspec)             Could not resolve font "Noto Color Emoji/BI" (it
@@ -819,13 +851,7 @@ Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
 ) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdfescape/pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
- (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdftexcmds/pdftexcmds.sty
-Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
-Package pdftexcmds Info: \pdf@primitive is available.
-Package pdftexcmds Info: \pdf@ifprimitive is available.
-Package pdftexcmds Info: \pdfdraftmode found.
-\pdftexcmds@toks=\toks42
-)) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hycolor/hycolor.sty
+) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hycolor/hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
 ) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hyperref/nameref.sty
 Package: nameref 2025-06-21 v2.57 Cross-referencing by name of section
@@ -836,19 +862,19 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count356
+\c@section@level=\count358
 ) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/stringenc/stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO)
 )
 \@linkdim=\dimen312
-\Hy@linkcounter=\count357
-\Hy@pagecounter=\count358
+\Hy@linkcounter=\count359
+\Hy@pagecounter=\count360
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2025-06-21 v7.01n Hyperref: PDFDocEncoding definition (HO)
 ) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count359
+\Hy@SavedSpaceFactor=\count361
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hyperref/puenc.def
 File: puenc.def 2025-06-21 v7.01n Hyperref: PDF Unicode definition (HO)
 )
@@ -859,7 +885,7 @@ Package hyperref Info: Plain pages OFF on input line 4196.
 Package hyperref Info: Backreferencing OFF on input line 4201.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4448.
-\c@Hy@tempcnt=\count360
+\c@Hy@tempcnt=\count362
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
@@ -871,7 +897,7 @@ Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 ))
-\Fld@menulength=\count361
+\Fld@menulength=\count363
 \Field@Width=\dimen314
 \Fld@charsize=\dimen315
 Package hyperref Info: Hyper figures OFF on input line 6066.
@@ -881,15 +907,15 @@ Package hyperref Info: backreferencing OFF on input line 6081.
 Package hyperref Info: Link coloring OFF on input line 6086.
 Package hyperref Info: Link coloring with OCG OFF on input line 6091.
 Package hyperref Info: PDF/A mode OFF on input line 6096.
-\Hy@abspage=\count362
-\c@Item=\count363
-\c@Hfootnote=\count364
+\Hy@abspage=\count364
+\c@Item=\count365
+\c@Hfootnote=\count366
 )
 Package hyperref Info: Driver (autodetected): hluatex.
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hyperref/hluatex.def
 File: hluatex.def 2025-06-21 v7.01n Hyperref driver for luaTeX
-\Fld@listcount=\count365
-\c@bookmark@seq@number=\count366
+\Fld@listcount=\count367
+\c@bookmark@seq@number=\count368
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/uniquecounter/uniquecounter.sty
@@ -899,30 +925,30 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 28
 )
 \Hy@SectionHShift=\skip57
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 38.
+Package hyperref Info: Option `colorlinks' set `true' on input line 39.
  (./document_windows.aux)
 \openout1 = document_windows.aux
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 74.
-LaTeX Font Info:    ... okay on input line 74.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 75.
+LaTeX Font Info:    ... okay on input line 75.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: luatex
@@ -965,68 +991,68 @@ Package fontspec Info:
 
 \symlegacymaths=\mathgroup4
 LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 74.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 74.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 74.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 74.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 74.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 74.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 74.
-LaTeX Font Info:    Redeclaring math accent \check on input line 74.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 74.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 74.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 74.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 74.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 74.
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 75.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 75.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 75.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 75.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 75.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 75.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 75.
+LaTeX Font Info:    Redeclaring math accent \check on input line 75.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 75.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 75.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 75.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 75.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 75.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 74.
+(Font)              `operators' in the math version `normal' on input line 75.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/NotoSans(0)/m/n on input line 74.
+(Font)                  OT1/cmr/m/n --> TU/NotoSans(0)/m/n on input line 75.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 74.
+(Font)              `operators' in the math version `bold' on input line 75.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> TU/NotoSans(0)/m/n on input line 74.
+(Font)                  OT1/cmr/bx/n --> TU/NotoSans(0)/m/n on input line 75.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  TU/NotoSans(0)/m/n --> TU/NotoSans(0)/m/n on input line 74.
+(Font)                  TU/NotoSans(0)/m/n --> TU/NotoSans(0)/m/n on input line 75.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/NotoSans(0)/m/it on input line 74.
+(Font)                  OT1/cmr/m/it --> TU/NotoSans(0)/m/it on input line 75.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/NotoSans(0)/b/n on input line 74.
+(Font)                  OT1/cmr/bx/n --> TU/NotoSans(0)/b/n on input line 75.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/NotoSans(1)/m/n on input line 74.
+(Font)                  OT1/cmss/m/n --> TU/NotoSans(1)/m/n on input line 75.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/NotoSansMono(0)/m/n on input line 74.
+(Font)                  OT1/cmtt/m/n --> TU/NotoSansMono(0)/m/n on input line 75.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  TU/NotoSans(0)/m/n --> TU/NotoSans(0)/b/n on input line 74.
+(Font)                  TU/NotoSans(0)/m/n --> TU/NotoSans(0)/b/n on input line 75.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> TU/NotoSans(0)/b/it on input line 74.
+(Font)                  OT1/cmr/bx/it --> TU/NotoSans(0)/b/it on input line 75.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/NotoSans(1)/b/n on input line 74.
+(Font)                  OT1/cmss/bx/n --> TU/NotoSans(1)/b/n on input line 75.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/NotoSansMono(0)/b/n on input line 74.
+(Font)                  OT1/cmtt/m/n --> TU/NotoSansMono(0)/b/n on input line 75.
 (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count367
+\scratchcounter=\count369
 \scratchdimen=\dimen316
-\scratchbox=\box83
-\nofMPsegments=\count368
-\nofMParguments=\count369
+\scratchbox=\box84
+\nofMPsegments=\count370
+\nofMParguments=\count371
 \everyMPshowfont=\toks43
-\MPscratchCnt=\count370
+\MPscratchCnt=\count372
 \MPscratchDim=\dimen317
-\MPnumerator=\count371
-\makeMPintoPDFobject=\count372
+\MPnumerator=\count373
+\makeMPintoPDFobject=\count374
 \everyMPtoPDFconversion=\toks44
 ) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -1034,11 +1060,11 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-\c@lstlisting=\count373
+\c@lstlisting=\count375
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring ON on input line 74.
+Package hyperref Info: Link coloring ON on input line 75.
  (./document_windows.out) (./document_windows.out)
 \@outlinefile=\write4
 
@@ -1062,26 +1088,26 @@ File: lstlang1.sty 2024/09/23 1.10c listings language file
 ) (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/09/23 1.10c listings language file
 )
-<static/file_server/demo.png, id=430, 868.74562pt x 469.00218pt>
+<static/file_server/demo.png, id=435, 868.74562pt x 469.00218pt>
 File: static/file_server/demo.png Graphic file (type png)
 <use static/file_server/demo.png>
-Package luatex.def Info: static/file_server/demo.png  used on input line 144.
+Package luatex.def Info: static/file_server/demo.png  used on input line 145.
 (luatex.def)             Requested size: 483.69687pt x 261.13658pt.
 
 
 [5<./static/file_server/demo.png>]
-<static/proxy_server/allow_youtube.png, id=444, 907.13907pt x 470.50781pt>
+<static/proxy_server/allow_youtube.png, id=449, 907.13907pt x 470.50781pt>
 File: static/proxy_server/allow_youtube.png Graphic file (type png)
 <use static/proxy_server/allow_youtube.png>
-Package luatex.def Info: static/proxy_server/allow_youtube.png  used on input line 179.
+Package luatex.def Info: static/proxy_server/allow_youtube.png  used on input line 180.
 (luatex.def)             Requested size: 483.69687pt x 250.88278pt.
 
 
 [6<./static/proxy_server/allow_youtube.png>]
-<static/proxy_server/block_facebook.png, id=457, 904.88063pt x 462.97969pt>
+<static/proxy_server/block_facebook.png, id=462, 904.88063pt x 462.97969pt>
 File: static/proxy_server/block_facebook.png Graphic file (type png)
 <use static/proxy_server/block_facebook.png>
-Package luatex.def Info: static/proxy_server/block_facebook.png  used on input line 186.
+Package luatex.def Info: static/proxy_server/block_facebook.png  used on input line 187.
 (luatex.def)             Requested size: 483.69687pt x 247.47621pt.
 
 
@@ -1092,17 +1118,17 @@ Package luatex.def Info: static/proxy_server/block_facebook.png  used on input l
 [8
 
 ]
-<static/dns_server/connect_dns_server.png, id=492, 637.63219pt x 386.94562pt>
+<static/dns_server/connect_dns_server.png, id=497, 637.63219pt x 386.94562pt>
 File: static/dns_server/connect_dns_server.png Graphic file (type png)
 <use static/dns_server/connect_dns_server.png>
-Package luatex.def Info: static/dns_server/connect_dns_server.png  used on input line 238.
+Package luatex.def Info: static/dns_server/connect_dns_server.png  used on input line 239.
 (luatex.def)             Requested size: 483.69687pt x 293.53262pt.
 
 
 [9
 
 <./static/dns_server/connect_dns_server.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 252--258
+Underfull \hbox (badness 10000) in paragraph at lines 253--259
 
  []
 
@@ -1110,11 +1136,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 252--258
 
 [10
 
-<./luatex.1w9yC7/1.png>]
-<static/dhcp_server/dhcp_server.png, id=527, 1028.34187pt x 472.76625pt>
+<./luatex.LxUXRP/1.png>]
+<static/dhcp_server/dhcp_server.png, id=532, 1028.34187pt x 472.76625pt>
 File: static/dhcp_server/dhcp_server.png Graphic file (type png)
 <use static/dhcp_server/dhcp_server.png>
-Package luatex.def Info: static/dhcp_server/dhcp_server.png  used on input line 291.
+Package luatex.def Info: static/dhcp_server/dhcp_server.png  used on input line 292.
 (luatex.def)             Requested size: 483.69687pt x 222.37329pt.
 
 
@@ -1125,31 +1151,31 @@ Package luatex.def Info: static/dhcp_server/dhcp_server.png  used on input line 
 [12
 
 ]
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 350.
-<static/vpn_server/connect_vpn_server.png, id=569, 901.86937pt x 461.47406pt>
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 351.
+<static/vpn_server/connect_vpn_server.png, id=574, 901.86937pt x 461.47406pt>
 File: static/vpn_server/connect_vpn_server.png Graphic file (type png)
 <use static/vpn_server/connect_vpn_server.png>
-Package luatex.def Info: static/vpn_server/connect_vpn_server.png  used on input line 363.
+Package luatex.def Info: static/vpn_server/connect_vpn_server.png  used on input line 364.
 (luatex.def)             Requested size: 483.69687pt x 247.5023pt.
 
 
 [13<./static/vpn_server/connect_vpn_server.png>]
-<static/terminal_server/connect_terminal_server.png, id=584, 903.375pt x 464.4853pt>
+<static/terminal_server/connect_terminal_server.png, id=590, 903.375pt x 464.4853pt>
 File: static/terminal_server/connect_terminal_server.png Graphic file (type png)
 <use static/terminal_server/connect_terminal_server.png>
-Package luatex.def Info: static/terminal_server/connect_terminal_server.png  used on input line 394.
+Package luatex.def Info: static/terminal_server/connect_terminal_server.png  used on input line 395.
 (luatex.def)             Requested size: 483.69687pt x 248.70627pt.
 
 
 [14<./static/terminal_server/connect_terminal_server.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 403--406
+Underfull \hbox (badness 10000) in paragraph at lines 404--407
 
  []
 
-<static/web_server/connect_web_server.png, id=600, 974.13937pt x 483.30562pt>
+<static/web_server/connect_web_server.png, id=605, 974.13937pt x 483.30562pt>
 File: static/web_server/connect_web_server.png Graphic file (type png)
 <use static/web_server/connect_web_server.png>
-Package luatex.def Info: static/web_server/connect_web_server.png  used on input line 422.
+Package luatex.def Info: static/web_server/connect_web_server.png  used on input line 423.
 (luatex.def)             Requested size: 483.69687pt x 239.97816pt.
 
 
@@ -1158,10 +1184,10 @@ Package luatex.def Info: static/web_server/connect_web_server.png  used on input
 [16]
 
 [17]
-<static/mail_server/connect_mail_server.png, id=682, 1028.34187pt x 554.07pt>
+<static/mail_server/connect_mail_server.png, id=688, 1028.34187pt x 554.07pt>
 File: static/mail_server/connect_mail_server.png Graphic file (type png)
 <use static/mail_server/connect_mail_server.png>
-Package luatex.def Info: static/mail_server/connect_mail_server.png  used on input line 526.
+Package luatex.def Info: static/mail_server/connect_mail_server.png  used on input line 527.
 (luatex.def)             Requested size: 483.69687pt x 260.61584pt.
 
 
@@ -1174,23 +1200,23 @@ Package luatex.def Info: static/mail_server/connect_mail_server.png  used on inp
 ]
 
 [20]
-<static/database_server/postgresql.png, id=770, 758.08218pt x 417.05812pt>
+<static/database_server/postgresql.png, id=775, 758.08218pt x 417.05812pt>
 File: static/database_server/postgresql.png Graphic file (type png)
 <use static/database_server/postgresql.png>
-Package luatex.def Info: static/database_server/postgresql.png  used on input line 648.
+Package luatex.def Info: static/database_server/postgresql.png  used on input line 649.
 (luatex.def)             Requested size: 483.69687pt x 266.10808pt.
-<static/database_server/sql_server.png, id=771, 1028.34187pt x 387.69844pt>
+<static/database_server/sql_server.png, id=776, 1028.34187pt x 387.69844pt>
 File: static/database_server/sql_server.png Graphic file (type png)
 <use static/database_server/sql_server.png>
-Package luatex.def Info: static/database_server/sql_server.png  used on input line 653.
+Package luatex.def Info: static/database_server/sql_server.png  used on input line 654.
 (luatex.def)             Requested size: 483.69687pt x 182.36026pt.
 
 
 [21<./static/database_server/postgresql.png><./static/database_server/sql_server.png>]
-<static/database_server/mongodb.png, id=781, 1028.34187pt x 242.40562pt>
+<static/database_server/mongodb.png, id=786, 1028.34187pt x 242.40562pt>
 File: static/database_server/mongodb.png Graphic file (type png)
 <use static/database_server/mongodb.png>
-Package luatex.def Info: static/database_server/mongodb.png  used on input line 658.
+Package luatex.def Info: static/database_server/mongodb.png  used on input line 659.
 (luatex.def)             Requested size: 483.69687pt x 114.01941pt.
 
 
@@ -1201,10 +1227,10 @@ Package luatex.def Info: static/database_server/mongodb.png  used on input line 
 [23
 
 ]
-<static/backup_server/backup_server.png, id=811, 1027.58907pt x 412.54124pt>
+<static/backup_server/backup_server.png, id=816, 1027.58907pt x 412.54124pt>
 File: static/backup_server/backup_server.png Graphic file (type png)
 <use static/backup_server/backup_server.png>
-Package luatex.def Info: static/backup_server/backup_server.png  used on input line 701.
+Package luatex.def Info: static/backup_server/backup_server.png  used on input line 702.
 (luatex.def)             Requested size: 483.69687pt x 194.19026pt.
 
 
@@ -1215,109 +1241,115 @@ Package luatex.def Info: static/backup_server/backup_server.png  used on input l
 [25
 
 ]
-<static/load_balancing/server_1.png, id=831, 1028.34187pt x 520.19344pt>
+<static/load_balancing/server_1.png, id=836, 1028.34187pt x 520.19344pt>
 File: static/load_balancing/server_1.png Graphic file (type png)
 <use static/load_balancing/server_1.png>
-Package luatex.def Info: static/load_balancing/server_1.png  used on input line 745.
+Package luatex.def Info: static/load_balancing/server_1.png  used on input line 746.
 (luatex.def)             Requested size: 483.69687pt x 244.68144pt.
-<static/load_balancing/server_2.png, id=832, 1028.34187pt x 484.05844pt>
+<static/load_balancing/server_2.png, id=837, 1028.34187pt x 484.05844pt>
 File: static/load_balancing/server_2.png Graphic file (type png)
 <use static/load_balancing/server_2.png>
-Package luatex.def Info: static/load_balancing/server_2.png  used on input line 749.
+Package luatex.def Info: static/load_balancing/server_2.png  used on input line 750.
 (luatex.def)             Requested size: 483.69687pt x 227.68475pt.
 
 
 [26
 
 <./static/load_balancing/server_1.png><./static/load_balancing/server_2.png>]
-Overfull \hbox (4.46649pt too wide) in paragraph at lines 813--814
-[]\TU/NotoSans(0)/m/n/10.95 Use FSx for shared stor-age; Con-fig-ure SQL Server on clus-ter nodes;
- []
-
-
 
 [27]
 
 [28]
-Underfull \hbox (badness 10000) in paragraph at lines 832--835
+<static/failover_cluster/Failover Cluster.drawio.pdf, id=919, 197.98969pt x 219.82124pt>
+File: static/failover_cluster/Failover Cluster.drawio.pdf Graphic file (type pdf)
+<use static/failover_cluster/Failover Cluster.drawio.pdf>
+Package luatex.def Info: static/failover_cluster/Failover Cluster.drawio.pdf  used on input line 847.
+(luatex.def)             Requested size: 483.69687pt x 537.08752pt.
+
+
+[29<./static/failover_cluster/Failover Cluster.drawio.pdf>]
+Underfull \hbox (badness 10000) in paragraph at lines 856--859
 
  []
 
 
 
-[29]
+[30
 
-[30]
-<static/ftp_server/ftp_server.png, id=981, 899.61093pt x 541.27219pt>
+
+]
+
+[31]
+<static/ftp_server/ftp_server.png, id=1072, 899.61093pt x 541.27219pt>
 File: static/ftp_server/ftp_server.png Graphic file (type png)
 <use static/ftp_server/ftp_server.png>
-Package luatex.def Info: static/ftp_server/ftp_server.png  used on input line 954.
+Package luatex.def Info: static/ftp_server/ftp_server.png  used on input line 978.
 (luatex.def)             Requested size: 483.69687pt x 291.02724pt.
 
 
-[31<./static/ftp_server/ftp_server.png>]
-<static/docker/docker.png, id=991, 880.03781pt x 455.45157pt>
+[32<./static/ftp_server/ftp_server.png>]
+<static/docker/docker.png, id=1081, 880.03781pt x 455.45157pt>
 File: static/docker/docker.png Graphic file (type png)
 <use static/docker/docker.png>
-Package luatex.def Info: static/docker/docker.png  used on input line 983.
+Package luatex.def Info: static/docker/docker.png  used on input line 1007.
 (luatex.def)             Requested size: 483.69687pt x 250.3254pt.
 
 
-[32
+[33
 
 <./static/docker/docker.png>]
 
-[33
+[34
 
 ]
-<static/domain_controller/domain_controller.png, id=1012, 903.375pt x 439.6425pt>
+<static/domain_controller/domain_controller.png, id=1101, 903.375pt x 439.6425pt>
 File: static/domain_controller/domain_controller.png Graphic file (type png)
 <use static/domain_controller/domain_controller.png>
-Package luatex.def Info: static/domain_controller/domain_controller.png  used on input line 1021.
+Package luatex.def Info: static/domain_controller/domain_controller.png  used on input line 1045.
 (luatex.def)             Requested size: 483.69687pt x 235.40431pt.
 
 
-[34
+[35
 
 <./static/domain_controller/domain_controller.png>] (/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/09/23 1.10c listings language file
 )
 
-[35
+[36
 
 ]
 
-[36]
-<static/devspeedllm/devspeedllm.png, id=1127, 1028.34187pt x 521.69907pt>
+[37]
+<static/devspeedllm/devspeedllm.png, id=1217, 1028.34187pt x 521.69907pt>
 File: static/devspeedllm/devspeedllm.png Graphic file (type png)
 <use static/devspeedllm/devspeedllm.png>
-Package luatex.def Info: static/devspeedllm/devspeedllm.png  used on input line 1161.
+Package luatex.def Info: static/devspeedllm/devspeedllm.png  used on input line 1185.
 (luatex.def)             Requested size: 483.69687pt x 245.38963pt.
 
 
-[37<./static/devspeedllm/devspeedllm.png>] (./document_windows.aux)
+[38<./static/devspeedllm/devspeedllm.png>] (./document_windows.aux)
  ***********
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-06-09>
  ***********
 Package rerunfilecheck Info: File `document_windows.out' has not changed.
-(rerunfilecheck)             Checksum: 02B9FFD0FAEA0C9A87F5BC26191413E7;8735.
+(rerunfilecheck)             Checksum: 8F103993C85B28198D8F7C0EE6666D1E;8711.
 )
 
 Here is how much of LuaTeX's memory you used:
- 34204 strings out of 470207
- 1164475,1648299 words of node,token memory allocated
+ 35172 strings out of 470207
+ 1164432,1648299 words of node,token memory allocated
  1299 words of node memory still in use:
    30 hlist, 2 vlist, 14 rule, 2 glue, 4 kern, 1 glyph, 83 attribute, 56 glue_spec, 79 attribute_list, 2 write, 24 pdf_literal, 24 pdf_colorstack nodes
-   avail lists: 1:3,2:15737,3:466,4:24150,5:22503,6:135,7:26751,8:2,9:56511,10:61,11:2129
- 61058 multiletter control sequences out of 65536+600000
+   avail lists: 1:3,2:15737,3:464,4:24150,5:22503,6:137,7:26751,8:2,9:56511,10:61,11:2129
+ 61931 multiletter control sequences out of 65536+600000
  68 fonts using 24141327 bytes
- 98i,6n,98p,473b,1014s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 98i,6n,98p,489b,1018s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/fonts/truetype/google/noto/NotoSansMono-Regular.ttf></nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/fonts/truetype/google/noto/NotoSans-Regular.ttf></nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/fonts/truetype/google/noto/NotoSans-Bold.ttf>
-Output written on document_windows.pdf (37 pages, 5041298 bytes).
+Output written on document_windows.pdf (38 pages, 5061847 bytes).
 
-PDF statistics: 1205 PDF objects out of 1440 (max. 8388607)
- 1078 compressed objects within 11 object streams
- 659 named destinations out of 1000 (max. 131072)
- 824 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 1297 PDF objects out of 1440 (max. 8388607)
+ 1153 compressed objects within 12 object streams
+ 706 named destinations out of 1000 (max. 131072)
+ 832 words of extra memory for PDF output out of 10000 (max. 100000000)
 

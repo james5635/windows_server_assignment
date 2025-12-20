@@ -216,13 +216,22 @@ INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pgf/libraries/pgflibraryfadings.code.tex
 OUTPUT document_windows.pdf
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/tcolorbox/tcbposter.code.tex
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/svg/svg.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrbase.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrlfile.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrlfile-hook.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/koma-script/scrlogo.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdftexcmds/pdftexcmds.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdftexcmds/pdftexcmds.lua
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/tools/shellesc.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/transparent/transparent.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/transparent/transparent-nometadata.sty
+INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/auxhook/auxhook.sty
 INPUT /home/vscode/.texlive2025/texmf-var/luatex-cache/generic/fonts/hb/bacc7db5efcdf0d0920a3cc16d1fab481e406d605e444cc44a57ab9f4b0c2bf6.luc
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hyperref/hyperref.sty
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/kvsetkeys/kvsetkeys.sty
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/kvdefinekeys/kvdefinekeys.sty
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdfescape/pdfescape.sty
-INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdftexcmds/pdftexcmds.sty
-INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/generic/pdftexcmds/pdftexcmds.lua
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hycolor/hycolor.sty
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/hyperref/nameref.sty
 INPUT /nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/latex/refcount/refcount.sty
@@ -276,8 +285,8 @@ INPUT ./static/proxy_server/block_facebook.png
 INPUT ./static/proxy_server/block_facebook.png
 INPUT ./static/dns_server/connect_dns_server.png
 INPUT ./static/dns_server/connect_dns_server.png
-OUTPUT luatex.1w9yC7/1.png
-INPUT ./luatex.1w9yC7/1.png
+OUTPUT luatex.LxUXRP/1.png
+INPUT ./luatex.LxUXRP/1.png
 INPUT ./static/dhcp_server/dhcp_server.png
 INPUT ./static/dhcp_server/dhcp_server.png
 INPUT ./static/vpn_server/connect_vpn_server.png
@@ -300,6 +309,8 @@ INPUT ./static/load_balancing/server_1.png
 INPUT ./static/load_balancing/server_1.png
 INPUT ./static/load_balancing/server_2.png
 INPUT ./static/load_balancing/server_2.png
+INPUT ./static/failover_cluster/Failover Cluster.drawio.pdf
+INPUT ./static/failover_cluster/Failover Cluster.drawio.pdf
 INPUT ./static/ftp_server/ftp_server.png
 INPUT ./static/ftp_server/ftp_server.png
 INPUT ./static/docker/docker.png

@@ -124,8 +124,9 @@ LLMs - Large Language Model (Fine Tuner) ✅
     - choose 'web' as target group
     - add tcp (port 80) to inbound rule of the load balancer's security group
 12. Failover Cluster
-    - this ec2 instance work as a server enabling failover cluster
-    - other windows server can join this domain and setup the cluster
+    - there are 3 server 
+    - 1 server for domain controller
+    - 2 other server join the domain and work as a cluster
 13. FTP Server
     - use filezilla (port 21)
     - username: jame
