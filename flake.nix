@@ -1,5 +1,5 @@
 {
-  description = "Codespaces Nix env";
+  description = "My dev environment";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs";
 
@@ -9,10 +9,10 @@
     pkgs = import nixpkgs { inherit system; };
   in {
     devShells.${system}.default = pkgs.mkShell {
-      packages = with pkgs; [
-        nodejs
-        go
-        python312
+      packages = [
+        pkgs.git
+        pkgs.nodejs
+        pkgs.go
       ];
     };
   };
