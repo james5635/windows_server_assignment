@@ -13,7 +13,6 @@
         pkgs.git
         pkgs.nodejs
         pkgs.go
-        pkgs.texliveFull
       ];
     };
   };
