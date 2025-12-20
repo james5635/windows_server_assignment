@@ -757,7 +757,7 @@ Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_ass
 \subsection{AWS Configuration}
 Instance Name: Failover Cluster\\
 Instance Type: t3.medium or larger\\
-Storage: Shared storage using FSx for Windows or S3\\
+Storage: Shared storage using FSx for Windows, S3, or iSCSI (Internet Small Computer Systems Interface)\\
 Network: Placement groups for low latency\\
 Security Group:
 \begin{itemize}
@@ -774,8 +774,6 @@ Security Group:
 # ================================
 Write-Host "Installing Failover Clustering feature..." -ForegroundColor Cyan
 Install-WindowsFeature Failover-Clustering -IncludeManagementTools -Restart
-Write-Host "Installing File Server role (optional)..." -ForegroundColor Cyan
-Install-WindowsFeature FS-Fileserver
 \end{lstlisting}
 \subsubsection{ONE NODE ONLY}
 \begin{lstlisting}[language=bash]
