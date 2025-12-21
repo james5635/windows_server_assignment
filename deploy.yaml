@@ -974,8 +974,8 @@ Resources:
   # end docker, load balancing
 
   # begin domain controller, failover cluster #15 #12
-  # https://youtu.be/-4z-5dSvRoE?si=3HVHD9stgbfQgF_2 => How to allow RDP Access to a Domain Controller for Non-admin Users
   # allow all tcp, all udp, all icmp => other windows ec2 can join domain
+  # How to allow RDP Access to a Domain Controller for Non-admin Users => https://youtu.be/-4z-5dSvRoE?si=3HVHD9stgbfQgF_2
   DomainControllerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -1030,7 +1030,11 @@ Resources:
           # other windows server can join this domain and setup the cluster
           # 
           # Create Windows Server 2022 Failover Cluster using PowerShell => https://youtu.be/NHUUw2JUAec?si=jl-pPh--89VO94A1
+          # How to install and configure WINDOWS SERVER FAILOVER CLUSTER (WSFC) in AWS with shared storage => https://youtu.be/Yg6Yt1FPkwE?si=MR8t8-zPyWwrOMyC
           # 
+          # each node allow all tcp, udp, icmp
+          # access denied => can log in directly to the administrator
+          #
           # setting up the failover cluster on other windows server is like below:
           # ******************************************************************
           # 
@@ -1041,9 +1045,6 @@ Resources:
           # Write-Host "Installing Failover Clustering feature..." -ForegroundColor Cyan
           # Install-WindowsFeature Failover-Clustering -IncludeManagementTools -Restart
           #
-          # Write-Host "Installing File Server role (optional)..." -ForegroundColor Cyan
-          # Install-WindowsFeature FS-Fileserver
-          #
           # ******************************************************************
           #
           # # ================================
@@ -1053,7 +1054,7 @@ Resources:
           # # ---- CONFIGURATION ----
           # $ClusterName  = "MyCluster"
           # $ClusterNodes = @("Node1", "Node2")
-          # $ClusterIP    = "192.168.1.50"
+          # # $ClusterIP    = "192.168.1.50"
           #
           # # ---- 1. Validate the cluster ----
           # Write-Host "Validating cluster configuration..." -ForegroundColor Cyan
@@ -1066,7 +1067,7 @@ Resources:
           # New-Cluster `
           #     -Name $ClusterName `
           #     -Node $ClusterNodes `
-          #     -StaticAddress $ClusterIP `
+          # #    -StaticAddress $ClusterIP `
           #     -NoStorage `
           #     -Verbose
           #
@@ -1075,8 +1076,8 @@ Resources:
           # Get-ClusterNode
           #
           # # ---- 4. Configure cluster networks ----
-          # Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
-          # Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1
+          # # Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
+          # # Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1
           #
           # # ---- 5. Add disks & enable CSV ----
           # Write-Host "Checking for available disks..." -ForegroundColor Cyan
@@ -1099,7 +1100,7 @@ Resources:
           # Write-Host "  Failover Cluster Creation Complete!"
           # Write-Host "  Cluster Name: $ClusterName"
           # Write-Host "  Nodes: $($ClusterNodes -join ', ')"
-          # Write-Host "  IP: $ClusterIP"
+          # # Write-Host "  IP: $ClusterIP"
           # Write-Host "=====================================" -ForegroundColor Green
           # 
           # ******************************************************************

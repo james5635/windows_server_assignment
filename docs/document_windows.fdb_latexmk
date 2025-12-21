@@ -1,5 +1,5 @@
 # Fdb version 4
-["lualatex"] 1766287648.57991 "/workspaces/windows_server_assignment/docs/document_windows.tex" "document_windows.pdf" "document_windows" 1766287655.42872 0
+["lualatex"] 1766315018.4411 "/workspaces/windows_server_assignment/docs/document_windows.tex" "document_windows.pdf" "document_windows" 1766315025.67777 0
   "/home/vscode/.texlive2025/texmf-var/luatex-cache/generic/fonts/hb/bacc7db5efcdf0d0920a3cc16d1fab481e406d605e444cc44a57ab9f4b0c2bf6.luc" 1766237496.65992 124341 4308c4e34020d98d6427d542efac80f3 ""
   "/home/vscode/.texlive2025/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-bold.luc" 1766237492.83092 128419 58cfac00be94c44d18ab13abaf10035a ""
   "/home/vscode/.texlive2025/texmf-var/luatex-cache/generic/fonts/otl/lmroman10-regular.luc" 1766237492.59692 127336 b6e1b647057efb7e3c48faf6f27134cc ""
@@ -250,11 +250,11 @@
   "/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/luatex/luaotfload/luaotfload-tounicode.lua" 1 7529 21fe79d2526f3c3d789a9cc0366347ab ""
   "/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/luatex/luaotfload/luaotfload-unicode.lua" 1 7918 4272855a25780b80472f3b58edd95e33 ""
   "/nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/tex/luatex/luaotfload/luaotfload.lua" 1 13566 16df94dd2de231b2bca0aaa0190941fe ""
-  "/workspaces/windows_server_assignment/docs/document_windows.tex" 1766287641.23823 42627 726bcb91f201d40a639b00d9a30021f8 ""
-  "document_windows.aux" 1766287654.98723 12279 39fdb11d2bfffc54168aa3906572ab38 "lualatex"
-  "document_windows.out" 1766287654.98923 8678 cf487cfea12389cace800f9b08e11d78 "lualatex"
-  "document_windows.tex" 1766287641.23823 42627 726bcb91f201d40a639b00d9a30021f8 ""
-  "document_windows.toc" 1766287654.99023 5687 b5a3552ce8e783a5c5f6362194dc5866 "lualatex"
+  "/workspaces/windows_server_assignment/docs/document_windows.tex" 1766315013.71743 42552 3dad13d19697d144fbe1e67d08aa93e4 ""
+  "document_windows.aux" 1766315025.23043 12428 4c6b9b2a10496a8cf7fb355de82700dc "lualatex"
+  "document_windows.out" 1766315025.23243 8678 cf487cfea12389cace800f9b08e11d78 "lualatex"
+  "document_windows.tex" 1766315013.71743 42552 3dad13d19697d144fbe1e67d08aa93e4 ""
+  "document_windows.toc" 1766315025.23343 5687 b5a3552ce8e783a5c5f6362194dc5866 "lualatex"
   "static/backup_server/backup_server.png" 1766233335.06573 203567 2200375cede960472d73f955067d48d6 ""
   "static/database_server/mongodb.png" 1766233335.06673 225945 68f1e5999a365f03bd2159fae02731f6 ""
   "static/database_server/postgresql.png" 1766233335.06773 209420 8d83e0afb1f01b675c0a6c89112d9668 ""
@@ -264,6 +264,7 @@
   "static/dns_server/connect_dns_server.png" 1766233335.07473 330161 806b9a5e220545450d157e8cfdd60759 ""
   "static/docker/docker.png" 1766233335.07573 270669 3be65a0ab14657c4a7db2dca0e8cacdf ""
   "static/domain_controller/domain_controller.png" 1766233335.07673 301245 72e90f3f4598189f079a9fea88a621da ""
+  "static/failover_cluster/2_nodes.png" 1766313855.50747 112278 4ddf21e73245346ccff76b932f2e6ba4 ""
   "static/failover_cluster/Failover Cluster.drawio.pdf" 1766241314.59409 17340 b98a4c3fc01c9b9c2fb6fee03923c04b ""
   "static/file_server/demo.png" 1766233335.07873 235462 0041cadec14ac4a99afa7189d753bfdc ""
   "static/ftp_server/ftp_server.png" 1766233335.08173 293483 0823991b02a1a6387e7a127f4794966a ""

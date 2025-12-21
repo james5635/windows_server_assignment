@@ -760,8 +760,10 @@ Storage: Shared storage using FSx for Windows, S3, or iSCSI (Internet Small Comp
 Network: Placement groups for low latency\\
 Security Group:
 \begin{itemize}
-	\item Allow cluster communication ports
 	\item tcp 3389 (RDP)
+	\item tcp 0-65535 (All tcp ports)
+	\item udp 0-65535 (all udp ports)
+	\item icmp -1 (all icmp)
 \end{itemize}
 
 \subsection{Implementation}
@@ -783,7 +785,6 @@ Install-WindowsFeature Failover-Clustering -IncludeManagementTools -Restart
 # ---- CONFIGURATION ----
 $ClusterName  = "MyCluster"
 $ClusterNodes = @("Node1", "Node2")
-$ClusterIP    = "192.168.1.50"
           
 # ---- 1. Validate the cluster ----
 Write-Host "Validating cluster configuration..." -ForegroundColor Cyan
@@ -796,7 +797,6 @@ Write-Host "Creating cluster..." -ForegroundColor Cyan
 New-Cluster `
     -Name $ClusterName `
     -Node $ClusterNodes `
-    -StaticAddress $ClusterIP `
     -NoStorage `
     -Verbose
           
@@ -804,11 +804,7 @@ New-Cluster `
 Get-Cluster
 Get-ClusterNode
           
-# ---- 4. Configure cluster networks ----
-Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
-Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1
-          
-# ---- 5. Add disks & enable CSV ----
+# ---- 4. Add disks & enable CSV ----
 Write-Host "Checking for available disks..." -ForegroundColor Cyan
 $AvailableDisks = Get-ClusterAvailableDisk
           
@@ -820,16 +816,15 @@ if ($AvailableDisks) {
     Write-Host "No available disks found. Skipping CSV." -ForegroundColor Yellow
 }
           
-# ---- 6. Configure Quorum ----
+# ---- 5. Configure Quorum ----
 Write-Host "Configuring quorum (Node Majority)..." -ForegroundColor Cyan
 Set-ClusterQuorum -NodeMajority
           
 # ---- DONE ----
-Write-Host "`n====================================="
+Write-Host "====================================="
 Write-Host "  Failover Cluster Creation Complete!"
 Write-Host "  Cluster Name: $ClusterName"
 Write-Host "  Nodes: $($ClusterNodes -join ', ')"
-Write-Host "  IP: $ClusterIP"
 Write-Host "=====================================" -ForegroundColor Green
           
 \end{lstlisting}
@@ -839,6 +834,11 @@ Write-Host "=====================================" -ForegroundColor Green
 	\item 1 server for domain controller
 	\item 2 other servers join the domain and work as a cluster
 \end{itemize}
+
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/failover_cluster/2_nodes.png}
+	\caption{2 nodes are up in a cluster}
+\end{figure}
 \clearpage
 \begin{figure}[htbp]
 	\includegraphics[width=\textwidth]{static/failover_cluster/Failover Cluster.drawio.pdf}
