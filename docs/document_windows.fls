@@ -285,8 +285,8 @@ INPUT ./static/proxy_server/block_facebook.png
 INPUT ./static/proxy_server/block_facebook.png
 INPUT ./static/dns_server/connect_dns_server.png
 INPUT ./static/dns_server/connect_dns_server.png
-OUTPUT luatex.2QL9tj/1.png
-INPUT ./luatex.2QL9tj/1.png
+OUTPUT luatex.3DhdpM/1.png
+INPUT ./luatex.3DhdpM/1.png
 INPUT ./static/dhcp_server/dhcp_server.png
 INPUT ./static/dhcp_server/dhcp_server.png
 INPUT ./static/vpn_server/connect_vpn_server.png

@@ -429,10 +429,9 @@ Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_ass
 \section{Mail Server}
 
 \subsection{AWS Configuration}
-\textbf{Instance Type:} t3.medium\\
-\textbf{Security Group Ports:} 25 (SMTP), 110 (POP3), 143 (IMAP), 587 (Submission), 993 (IMAPS), 995 (POP3S)\\
-\textbf{Elastic IP:} Required\\
-\textbf{Note:} AWS blocks port 25 by default; request removal.
+Instance Name: Mail Server\\
+Instance Type: t3.medium or larger\\
+Security Group Ports: tcp 25 (SMTP), tcp 143 (IMAP), tcp 3389 (RDP)
 
 \subsection{Implementation}
 

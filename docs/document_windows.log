@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.21.0 (TeX Live 2025/nixos.org)  (format=lualatex 1980.1.1)  20 DEC 2025 15:54
+This is LuaHBTeX, Version 1.21.0 (TeX Live 2025/nixos.org)  (format=lualatex 1980.1.1)  21 DEC 2025 01:46
  restricted system commands enabled.
  file:line:error style messages enabled.
 **/workspaces/windows_server_assignment/docs/document_windows.tex
@@ -1136,7 +1136,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 253--259
 
 [10
 
-<./luatex.2QL9tj/1.png>]
+<./luatex.3DhdpM/1.png>]
 <static/dhcp_server/dhcp_server.png, id=532, 1028.34187pt x 472.76625pt>
 File: static/dhcp_server/dhcp_server.png Graphic file (type png)
 <use static/dhcp_server/dhcp_server.png>
@@ -1187,7 +1187,7 @@ Package luatex.def Info: static/web_server/connect_web_server.png  used on input
 <static/mail_server/connect_mail_server.png, id=688, 1028.34187pt x 554.07pt>
 File: static/mail_server/connect_mail_server.png Graphic file (type png)
 <use static/mail_server/connect_mail_server.png>
-Package luatex.def Info: static/mail_server/connect_mail_server.png  used on input line 527.
+Package luatex.def Info: static/mail_server/connect_mail_server.png  used on input line 526.
 (luatex.def)             Requested size: 483.69687pt x 260.61584pt.
 
 
@@ -1203,12 +1203,12 @@ Package luatex.def Info: static/mail_server/connect_mail_server.png  used on inp
 <static/database_server/postgresql.png, id=775, 758.08218pt x 417.05812pt>
 File: static/database_server/postgresql.png Graphic file (type png)
 <use static/database_server/postgresql.png>
-Package luatex.def Info: static/database_server/postgresql.png  used on input line 649.
+Package luatex.def Info: static/database_server/postgresql.png  used on input line 648.
 (luatex.def)             Requested size: 483.69687pt x 266.10808pt.
 <static/database_server/sql_server.png, id=776, 1028.34187pt x 387.69844pt>
 File: static/database_server/sql_server.png Graphic file (type png)
 <use static/database_server/sql_server.png>
-Package luatex.def Info: static/database_server/sql_server.png  used on input line 654.
+Package luatex.def Info: static/database_server/sql_server.png  used on input line 653.
 (luatex.def)             Requested size: 483.69687pt x 182.36026pt.
 
 
@@ -1216,7 +1216,7 @@ Package luatex.def Info: static/database_server/sql_server.png  used on input li
 <static/database_server/mongodb.png, id=786, 1028.34187pt x 242.40562pt>
 File: static/database_server/mongodb.png Graphic file (type png)
 <use static/database_server/mongodb.png>
-Package luatex.def Info: static/database_server/mongodb.png  used on input line 659.
+Package luatex.def Info: static/database_server/mongodb.png  used on input line 658.
 (luatex.def)             Requested size: 483.69687pt x 114.01941pt.
 
 
@@ -1230,7 +1230,7 @@ Package luatex.def Info: static/database_server/mongodb.png  used on input line 
 <static/backup_server/backup_server.png, id=816, 1027.58907pt x 412.54124pt>
 File: static/backup_server/backup_server.png Graphic file (type png)
 <use static/backup_server/backup_server.png>
-Package luatex.def Info: static/backup_server/backup_server.png  used on input line 702.
+Package luatex.def Info: static/backup_server/backup_server.png  used on input line 701.
 (luatex.def)             Requested size: 483.69687pt x 194.19026pt.
 
 
@@ -1244,12 +1244,12 @@ Package luatex.def Info: static/backup_server/backup_server.png  used on input l
 <static/load_balancing/server_1.png, id=836, 1028.34187pt x 520.19344pt>
 File: static/load_balancing/server_1.png Graphic file (type png)
 <use static/load_balancing/server_1.png>
-Package luatex.def Info: static/load_balancing/server_1.png  used on input line 746.
+Package luatex.def Info: static/load_balancing/server_1.png  used on input line 745.
 (luatex.def)             Requested size: 483.69687pt x 244.68144pt.
 <static/load_balancing/server_2.png, id=837, 1028.34187pt x 484.05844pt>
 File: static/load_balancing/server_2.png Graphic file (type png)
 <use static/load_balancing/server_2.png>
-Package luatex.def Info: static/load_balancing/server_2.png  used on input line 750.
+Package luatex.def Info: static/load_balancing/server_2.png  used on input line 749.
 (luatex.def)             Requested size: 483.69687pt x 227.68475pt.
 
 
@@ -1263,12 +1263,12 @@ Package luatex.def Info: static/load_balancing/server_2.png  used on input line 
 <static/failover_cluster/Failover Cluster.drawio.pdf, id=917, 197.98969pt x 219.82124pt>
 File: static/failover_cluster/Failover Cluster.drawio.pdf Graphic file (type pdf)
 <use static/failover_cluster/Failover Cluster.drawio.pdf>
-Package luatex.def Info: static/failover_cluster/Failover Cluster.drawio.pdf  used on input line 845.
+Package luatex.def Info: static/failover_cluster/Failover Cluster.drawio.pdf  used on input line 844.
 (luatex.def)             Requested size: 483.69687pt x 537.08752pt.
 
 
 [29<./static/failover_cluster/Failover Cluster.drawio.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 854--857
+Underfull \hbox (badness 10000) in paragraph at lines 853--856
 
  []
 
@@ -1283,7 +1283,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 854--857
 <static/ftp_server/ftp_server.png, id=1070, 899.61093pt x 541.27219pt>
 File: static/ftp_server/ftp_server.png Graphic file (type png)
 <use static/ftp_server/ftp_server.png>
-Package luatex.def Info: static/ftp_server/ftp_server.png  used on input line 976.
+Package luatex.def Info: static/ftp_server/ftp_server.png  used on input line 975.
 (luatex.def)             Requested size: 483.69687pt x 291.02724pt.
 
 
@@ -1291,7 +1291,7 @@ Package luatex.def Info: static/ftp_server/ftp_server.png  used on input line 97
 <static/docker/docker.png, id=1079, 880.03781pt x 455.45157pt>
 File: static/docker/docker.png Graphic file (type png)
 <use static/docker/docker.png>
-Package luatex.def Info: static/docker/docker.png  used on input line 1005.
+Package luatex.def Info: static/docker/docker.png  used on input line 1004.
 (luatex.def)             Requested size: 483.69687pt x 250.3254pt.
 
 
@@ -1305,7 +1305,7 @@ Package luatex.def Info: static/docker/docker.png  used on input line 1005.
 <static/domain_controller/domain_controller.png, id=1099, 903.375pt x 439.6425pt>
 File: static/domain_controller/domain_controller.png Graphic file (type png)
 <use static/domain_controller/domain_controller.png>
-Package luatex.def Info: static/domain_controller/domain_controller.png  used on input line 1043.
+Package luatex.def Info: static/domain_controller/domain_controller.png  used on input line 1042.
 (luatex.def)             Requested size: 483.69687pt x 235.40431pt.
 
 
@@ -1323,7 +1323,7 @@ File: lstlang1.sty 2024/09/23 1.10c listings language file
 <static/devspeedllm/devspeedllm.png, id=1215, 1028.34187pt x 521.69907pt>
 File: static/devspeedllm/devspeedllm.png Graphic file (type png)
 <use static/devspeedllm/devspeedllm.png>
-Package luatex.def Info: static/devspeedllm/devspeedllm.png  used on input line 1183.
+Package luatex.def Info: static/devspeedllm/devspeedllm.png  used on input line 1182.
 (luatex.def)             Requested size: 483.69687pt x 245.38963pt.
 
 
@@ -1338,15 +1338,15 @@ Package rerunfilecheck Info: File `document_windows.out' has not changed.
 
 Here is how much of LuaTeX's memory you used:
  35169 strings out of 470207
- 1164432,1648299 words of node,token memory allocated
+ 1164426,1648299 words of node,token memory allocated
  1299 words of node memory still in use:
    30 hlist, 2 vlist, 14 rule, 2 glue, 4 kern, 1 glyph, 83 attribute, 56 glue_spec, 79 attribute_list, 2 write, 24 pdf_literal, 24 pdf_colorstack nodes
-   avail lists: 1:3,2:15737,3:464,4:24150,5:22503,6:137,7:26751,8:3,9:56511,10:61,11:2129
+   avail lists: 1:4,2:15737,3:464,4:24150,5:22503,6:136,7:26881,8:2,9:56511,10:61,11:2129
  61930 multiletter control sequences out of 65536+600000
  68 fonts using 24141327 bytes
  98i,6n,98p,489b,1018s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/fonts/truetype/google/noto/NotoSansMono-Regular.ttf></nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/fonts/truetype/google/noto/NotoSans-Regular.ttf></nix/store/gwml513ls7c6nqr7s87x8njh2fh5pw7q-texlive-2025-env-texmfdist/fonts/truetype/google/noto/NotoSans-Bold.ttf>
-Output written on document_windows.pdf (38 pages, 5061676 bytes).
+Output written on document_windows.pdf (38 pages, 5061467 bytes).
 
 PDF statistics: 1294 PDF objects out of 1440 (max. 8388607)
  1150 compressed objects within 12 object streams
