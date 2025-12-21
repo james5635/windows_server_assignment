@@ -1054,7 +1054,6 @@ Resources:
           # # ---- CONFIGURATION ----
           # $ClusterName  = "MyCluster"
           # $ClusterNodes = @("Node1", "Node2")
-          # # $ClusterIP    = "192.168.1.50"
           #
           # # ---- 1. Validate the cluster ----
           # Write-Host "Validating cluster configuration..." -ForegroundColor Cyan
@@ -1067,7 +1066,6 @@ Resources:
           # New-Cluster `
           #     -Name $ClusterName `
           #     -Node $ClusterNodes `
-          # #    -StaticAddress $ClusterIP `
           #     -NoStorage `
           #     -Verbose
           #
@@ -1075,11 +1073,7 @@ Resources:
           # Get-Cluster
           # Get-ClusterNode
           #
-          # # ---- 4. Configure cluster networks ----
-          # # Write-Host "Configuring cluster network settings..." -ForegroundColor Cyan
-          # # Get-ClusterNetwork | Set-ClusterNetwork -AutoMetric 1
-          #
-          # # ---- 5. Add disks & enable CSV ----
+          # # ---- 4. Add disks & enable CSV ----
           # Write-Host "Checking for available disks..." -ForegroundColor Cyan
           # $AvailableDisks = Get-ClusterAvailableDisk
           #
@@ -1091,16 +1085,15 @@ Resources:
           #     Write-Host "No available disks found. Skipping CSV." -ForegroundColor Yellow
           # }
           #
-          # # ---- 6. Configure Quorum ----
+          # # ---- 5. Configure Quorum ----
           # Write-Host "Configuring quorum (Node Majority)..." -ForegroundColor Cyan
           # Set-ClusterQuorum -NodeMajority
           #
           # # ---- DONE ----
-          # Write-Host "`n====================================="
+          # Write-Host "====================================="
           # Write-Host "  Failover Cluster Creation Complete!"
           # Write-Host "  Cluster Name: $ClusterName"
           # Write-Host "  Nodes: $($ClusterNodes -join ', ')"
-          # # Write-Host "  IP: $ClusterIP"
           # Write-Host "=====================================" -ForegroundColor Green
           # 
           # ******************************************************************
