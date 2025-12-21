@@ -45,7 +45,7 @@
 \contentsline {subsection}{\numberline {10.3}Usage}{23}{subsection.10.3}%
 \contentsline {section}{\numberline {11}Load Balancing}{25}{section.11}%
 \contentsline {subsection}{\numberline {11.1}AWS Configuration}{25}{subsection.11.1}%
-\contentsline {subsection}{\numberline {11.2}Implementation Steps}{25}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.2}Implementation}{25}{subsection.11.2}%
 \contentsline {subsubsection}{\numberline {11.2.1}Server 1}{25}{subsubsection.11.2.1}%
 \contentsline {subsubsection}{\numberline {11.2.2}Server 2}{25}{subsubsection.11.2.2}%
 \contentsline {subsection}{\numberline {11.3}Usage}{25}{subsection.11.3}%
