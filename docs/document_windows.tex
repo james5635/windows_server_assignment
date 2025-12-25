@@ -710,12 +710,11 @@ Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_ass
 Service: Application Load Balancer (ALB)\\
 Target Group: Multiple Windows Server instances\\
 Instance Type: t3.medium\\
-Security Group Ports: tcp 3389 (RDP)
+Security Group Ports: tcp 80, tcp 3389 (RDP)
 
 \subsection{Implementation}
 \subsubsection{Server 1}
 \begin{lstlisting}[language=bash]
-Start-Transcript -Path "C:\WebServer.log" -Append
 Install-WindowsFeature -Name Web-Server
 # echo "Server 1" > C:\inetpub\wwwroot\index.html
 \end{lstlisting}
