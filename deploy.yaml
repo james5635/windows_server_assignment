@@ -1031,6 +1031,7 @@ Resources:
           # 
           # Create Windows Server 2022 Failover Cluster using PowerShell => https://youtu.be/NHUUw2JUAec?si=jl-pPh--89VO94A1
           # How to install and configure WINDOWS SERVER FAILOVER CLUSTER (WSFC) in AWS with shared storage => https://youtu.be/Yg6Yt1FPkwE?si=MR8t8-zPyWwrOMyC
+          # Setting up Windows Server Failover Cluster shared storage on AWS => https://aws.amazon.com/blogs/modernizing-with-aws/windows-server-failover-cluster-shared-storage-aws-outposts-rack/
           # 
           # each node allow all tcp, udp, icmp
           # access denied => can log in directly to the administrator
