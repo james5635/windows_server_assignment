@@ -55,19 +55,19 @@
 \contentsline {subsubsection}{\numberline {12.2.1}EVERY NODE}{27}{subsubsection.12.2.1}%
 \contentsline {subsubsection}{\numberline {12.2.2}ONE NODE ONLY}{27}{subsubsection.12.2.2}%
 \contentsline {subsection}{\numberline {12.3}Usage}{28}{subsection.12.3}%
-\contentsline {section}{\numberline {13}FTP Server}{30}{section.13}%
-\contentsline {subsection}{\numberline {13.1}AWS Configuration}{30}{subsection.13.1}%
-\contentsline {subsection}{\numberline {13.2}Implementation}{30}{subsection.13.2}%
-\contentsline {subsection}{\numberline {13.3}Usage}{32}{subsection.13.3}%
-\contentsline {section}{\numberline {14}Container (Docker)}{33}{section.14}%
-\contentsline {subsection}{\numberline {14.1}AWS Configuration}{33}{subsection.14.1}%
-\contentsline {subsection}{\numberline {14.2}Implementation}{33}{subsection.14.2}%
-\contentsline {subsection}{\numberline {14.3}Usage}{33}{subsection.14.3}%
-\contentsline {section}{\numberline {15}Domain Controller}{34}{section.15}%
-\contentsline {subsection}{\numberline {15.1}AWS Configuration}{34}{subsection.15.1}%
-\contentsline {subsection}{\numberline {15.2}Implementation}{34}{subsection.15.2}%
-\contentsline {subsection}{\numberline {15.3}Usage}{34}{subsection.15.3}%
-\contentsline {section}{\numberline {16}DevSpeedLLM}{36}{section.16}%
-\contentsline {subsection}{\numberline {16.1}Configuration}{36}{subsection.16.1}%
-\contentsline {subsection}{\numberline {16.2}Implementation}{36}{subsection.16.2}%
-\contentsline {subsection}{\numberline {16.3}Usage}{38}{subsection.16.3}%
+\contentsline {section}{\numberline {13}FTP Server}{31}{section.13}%
+\contentsline {subsection}{\numberline {13.1}AWS Configuration}{31}{subsection.13.1}%
+\contentsline {subsection}{\numberline {13.2}Implementation}{31}{subsection.13.2}%
+\contentsline {subsection}{\numberline {13.3}Usage}{33}{subsection.13.3}%
+\contentsline {section}{\numberline {14}Container (Docker)}{34}{section.14}%
+\contentsline {subsection}{\numberline {14.1}AWS Configuration}{34}{subsection.14.1}%
+\contentsline {subsection}{\numberline {14.2}Implementation}{34}{subsection.14.2}%
+\contentsline {subsection}{\numberline {14.3}Usage}{34}{subsection.14.3}%
+\contentsline {section}{\numberline {15}Domain Controller}{35}{section.15}%
+\contentsline {subsection}{\numberline {15.1}AWS Configuration}{35}{subsection.15.1}%
+\contentsline {subsection}{\numberline {15.2}Implementation}{35}{subsection.15.2}%
+\contentsline {subsection}{\numberline {15.3}Usage}{35}{subsection.15.3}%
+\contentsline {section}{\numberline {16}DevSpeedLLM}{37}{section.16}%
+\contentsline {subsection}{\numberline {16.1}Configuration}{37}{subsection.16.1}%
+\contentsline {subsection}{\numberline {16.2}Implementation}{37}{subsection.16.2}%
+\contentsline {subsection}{\numberline {16.3}Usage}{39}{subsection.16.3}%

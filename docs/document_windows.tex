@@ -755,7 +755,7 @@ Invoke-WebRequest https://raw.githubusercontent.com/james5635/windows_server_ass
 \subsection{AWS Configuration}
 Instance Name: Failover Cluster\\
 Instance Type: t3.medium or larger\\
-Storage: Shared storage using FSx for Windows, S3, or iSCSI (Internet Small Computer Systems Interface)\\
+Storage: Shared storage using FSx for Windows, S3, iSCSI (Internet Small Computer Systems Interface), or Storage Spaces Direct (S2D)\\
 Network: Placement groups for low latency\\
 Security Group:
 \begin{itemize}
@@ -837,6 +837,11 @@ Write-Host "=====================================" -ForegroundColor Green
 \begin{figure}[htbp]
 	\includegraphics[width=\textwidth]{static/failover_cluster/2_nodes.png}
 	\caption{2 nodes are up in a cluster}
+\end{figure}
+\clearpage
+\begin{figure}[htbp]
+	\includegraphics[width=\textwidth]{static/failover_cluster/failover_cluster_for_file_server.png}
+	\caption{Failover cluster for file server using Storage Spaces Direct (S2D)}
 \end{figure}
 \clearpage
 \begin{figure}[htbp]

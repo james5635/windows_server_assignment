@@ -286,8 +286,8 @@ INPUT ./static/proxy_server/block_facebook.png
 INPUT ./static/proxy_server/block_facebook.png
 INPUT ./static/dns_server/connect_dns_server.png
 INPUT ./static/dns_server/connect_dns_server.png
-OUTPUT luatex.LK6Y48/1.png
-INPUT ./luatex.LK6Y48/1.png
+OUTPUT luatex.WwZxPk/1.png
+INPUT ./luatex.WwZxPk/1.png
 INPUT ./static/dhcp_server/dhcp_server.png
 INPUT ./static/dhcp_server/dhcp_server.png
 INPUT ./static/vpn_server/connect_vpn_server.png
@@ -312,6 +312,8 @@ INPUT ./static/load_balancing/server_2.png
 INPUT ./static/load_balancing/server_2.png
 INPUT ./static/failover_cluster/2_nodes.png
 INPUT ./static/failover_cluster/2_nodes.png
+INPUT ./static/failover_cluster/failover_cluster_for_file_server.png
+INPUT ./static/failover_cluster/failover_cluster_for_file_server.png
 INPUT ./static/failover_cluster/Failover Cluster.drawio.pdf
 INPUT ./static/failover_cluster/Failover Cluster.drawio.pdf
 INPUT ./static/ftp_server/ftp_server.png

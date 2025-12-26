@@ -1,7 +1,7 @@
 # Fdb version 4
-["lualatex"] 1766652995.54464 "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" "document_windows.pdf" "document_windows" 1766653010.85929 0
+["lualatex"] 1766733913.30566 "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" "document_windows.pdf" "document_windows" 1766733933.14014 0
   "/home/jame/.texlive2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1766209232 282704 85b421a351791d11718f9e25e191163d ""
-  "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" 1766652994.94166 42510 42a5b9394e6afb5d79165f63b0c88a71 ""
+  "/home/jame/Desktop/coding/windows_server_assignment/docs/document_windows.tex" 1766733903.06398 42760 4d606a21e9b745a7b6c911375296752a ""
   "/home/jame/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/home/jame/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
   "/home/jame/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmex10.tfm" 1136768653 992 662f679a0b3d2d53c1b94050fdaa3f50 ""
@@ -252,10 +252,10 @@
   "/usr/share/fonts/noto/NotoSans-Bold.ttf" 1764573472 631484 95a12ca7e42d6c5e69e630039042c33f ""
   "/usr/share/fonts/noto/NotoSans-Regular.ttf" 1764573472 621572 f53b83ff53f1d2632bf4d26382469b44 ""
   "/usr/share/fonts/noto/NotoSansMono-Regular.ttf" 1764573472 596428 8fdf2b5ca681070e7fafceae12f30d74 ""
-  "document_windows.aux" 1766653010.03195 12428 4c6b9b2a10496a8cf7fb355de82700dc "lualatex"
-  "document_windows.out" 1766653010.03529 8678 cf487cfea12389cace800f9b08e11d78 "lualatex"
-  "document_windows.tex" 1766652994.94166 42510 42a5b9394e6afb5d79165f63b0c88a71 ""
-  "document_windows.toc" 1766653010.03529 5687 b5a3552ce8e783a5c5f6362194dc5866 "lualatex"
+  "document_windows.aux" 1766733931.005 12616 1c40bb5125902955b33a81b6f7237869 "lualatex"
+  "document_windows.out" 1766733931.03501 8678 cf487cfea12389cace800f9b08e11d78 "lualatex"
+  "document_windows.tex" 1766733903.06398 42760 4d606a21e9b745a7b6c911375296752a ""
+  "document_windows.toc" 1766733931.05167 5687 c49cdd383a078df9364ccf2eef943c19 "lualatex"
   "static/backup_server/backup_server.png" 1766155724.24475 203567 2200375cede960472d73f955067d48d6 ""
   "static/database_server/mongodb.png" 1766151643.04913 225945 68f1e5999a365f03bd2159fae02731f6 ""
   "static/database_server/postgresql.png" 1766151718.78462 209420 8d83e0afb1f01b675c0a6c89112d9668 ""
@@ -267,6 +267,7 @@
   "static/domain_controller/domain_controller.png" 1766200283.14362 301245 72e90f3f4598189f079a9fea88a621da ""
   "static/failover_cluster/2_nodes.png" 1766315963.13351 112278 4ddf21e73245346ccff76b932f2e6ba4 ""
   "static/failover_cluster/Failover Cluster.drawio.pdf" 1766244419.79352 17340 b98a4c3fc01c9b9c2fb6fee03923c04b ""
+  "static/failover_cluster/failover_cluster_for_file_server.png" 1766730684.7328 55930 5f0b43a9bcbce0adee582cdd0fc502d1 ""
   "static/file_server/demo.png" 1766133981.419 235462 0041cadec14ac4a99afa7189d753bfdc ""
   "static/ftp_server/ftp_server.png" 1766158528.1171 293483 0823991b02a1a6387e7a127f4794966a ""
   "static/load_balancing/server_1.png" 1766157374.59832 214109 a0f4825887d9af86923635666ec405b6 ""
